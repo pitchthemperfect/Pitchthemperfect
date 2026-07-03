@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../utils/supabaseClient'
 
@@ -78,6 +78,8 @@ export default function AdminPage() {
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [refreshing, setRefreshing] = useState(false)
+  const fetchersRef = useRef({})
 
   // Pricing settings states
   const [watcherPriceInput, setWatcherPriceInput] = useState('181.00')
@@ -215,6 +217,9 @@ export default function AdminPage() {
     fetchRegistrations()
     fetchPrices()
     fetchEventCaps()
+
+    // Store so refresh can call them
+    fetchersRef.current = { fetchRegistrations, fetchPrices, fetchEventCaps }
   }, [isAuthenticated])
 
   const handleSavePrices = async (e) => {
@@ -396,6 +401,22 @@ export default function AdminPage() {
     setData(prev => prev.map(r => r.id === id ? { ...r, attended: newVal } : r))
   }
 
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    const f = fetchersRef.current
+    if (f.fetchRegistrations && f.fetchPrices && f.fetchEventCaps) {
+      await Promise.all([f.fetchRegistrations(), f.fetchPrices(), f.fetchEventCaps()])
+    }
+    setRefreshing(false)
+  }
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this registration permanently?')) return
+    const { error } = await supabase.from('registrations').delete().eq('id', id)
+    if (error) { console.error('Delete error:', error); return }
+    setData(prev => prev.filter(r => r.id !== id))
+  }
+
   // Filtered registrations list
   const filteredData = useMemo(() => {
     return data.filter(item => {
@@ -537,6 +558,14 @@ export default function AdminPage() {
             </button>
             <button 
               className="btn-submit-another" 
+              onClick={handleRefresh}
+              disabled={refreshing}
+              style={{ fontSize: 13, height: 38, padding: '0 16px', marginTop: 0 }}
+            >
+              {refreshing ? '⏳' : '🔄'} Refresh
+            </button>
+            <button 
+              className="btn-submit-another" 
               onClick={handleExport}
               style={{ fontSize: 13, height: 38, padding: '0 16px', marginTop: 0, borderColor: '#E8386D', color: '#E8386D' }}
             >
@@ -580,6 +609,9 @@ export default function AdminPage() {
             { label: 'Paid', val: stats.paidWatchers, color: '#2E7D32', icon: '✅', sub: null },
             { label: 'Pending', val: stats.pendingWatchers, color: '#F57F17', icon: '⏳', sub: null },
             { label: 'Waitlist', val: stats.waitlist, color: '#B8860B', icon: '📋', sub: 'overflow' },
+            { label: 'Pitcher M left', val: Math.max(0, parseInt(capPitcherMaleInput) - stats.pitchersMale), color: '#E8386D', icon: '🎤♂️', sub: `of ${capPitcherMaleInput}` },
+            { label: 'Pitcher F left', val: Math.max(0, parseInt(capPitcherFemaleInput) - stats.pitchersFemale), color: '#E8386D', icon: '🎤♀️', sub: `of ${capPitcherFemaleInput}` },
+            { label: 'Watcher left', val: Math.max(0, parseInt(capWatcherInput) - stats.watchersTotal), color: '#E8386D', icon: '👁', sub: `of ${capWatcherInput}` },
           ].map(s => (
             <div key={s.label} style={{ 
               background: '#FFF', 
@@ -1109,13 +1141,26 @@ export default function AdminPage() {
                                 background: '#FFEBEE', color: '#C62828', border: '1px solid #FFCDD2', cursor: 'pointer'
                               }}>✕ Decline</button>
                           </div>
+                        ) : row.status === 'waitlist' ? (
+                          <div style={{ display: 'flex', gap: 6 }}>
+                            <button onClick={() => handleUpdateStatus(row.id, row.role === 'pitcher' ? 'pitch' : 'pending')}
+                              title={row.role === 'pitcher' ? 'Move to active pitcher list' : 'Move to active watcher list'}
+                              style={{
+                                padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700,
+                                background: '#E8F5E9', color: '#2E7D32', border: '1px solid #C8E6C9', cursor: 'pointer'
+                              }}>↑ Promote</button>
+                          </div>
                         ) : row.role === 'pitcher' && row.status === 'confirmed' ? (
                           <span style={{ fontSize: 11, color: '#2E7D32', fontWeight: 600 }}>Approved ✓</span>
                         ) : row.role === 'pitcher' && row.status === 'declined' ? (
                           <span style={{ fontSize: 11, color: '#C62828', fontWeight: 600 }}>Declined</span>
-                        ) : row.status === 'waitlist' ? (
-                          <span style={{ fontSize: 11, color: '#B8860B', fontWeight: 600 }}>On waitlist</span>
                         ) : null}
+                        <button onClick={() => handleDelete(row.id)}
+                          style={{
+                            padding: '4px 10px', borderRadius: 6, fontSize: 10.5, fontWeight: 600,
+                            background: 'transparent', color: '#CCC', border: '1px solid #EEE', cursor: 'pointer',
+                            marginTop: 6
+                          }}>🗑 Delete</button>
                       </td>
                     </tr>
                   ))
