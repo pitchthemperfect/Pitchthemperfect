@@ -8,6 +8,7 @@ import WatcherPayment from './pages/WatcherPayment'
 import WatcherSuccess from './pages/WatcherSuccess'
 import PitcherPayment from './pages/PitcherPayment'
 import AdminPage from './pages/AdminPage'
+import WaitlistSuccess from './pages/WaitlistSuccess'
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/payment/watcher" element={<WatcherPayment />} />
         <Route path="/success/watcher" element={<WatcherSuccess />} />
         <Route path="/payment/pitcher" element={<PitcherPayment />} />
+        <Route path="/waitlist" element={<WaitlistSuccess />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

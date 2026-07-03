@@ -5,6 +5,7 @@ import FormCard from '../components/FormCard'
 import ChipGroup from '../components/ChipGroup'
 import ErrorBanner from '../components/ErrorBanner'
 import { useCapacity } from '../hooks/useCapacity'
+import { supabase } from '../utils/supabaseClient'
 
 const MicIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="role-icon">
@@ -21,11 +22,6 @@ const EyeIcon = () => (
   </svg>
 )
 
-const ROLE_OPTIONS = [
-  { value: 'pitcher', label: "I'm here to pitch someone",   icon: <MicIcon /> },
-  { value: 'watcher', label: "I'm here to watch the pitches", icon: <EyeIcon /> },
-]
-
 function getInitial() {
   try { const s = sessionStorage.getItem('ptp_step1'); if (s) return JSON.parse(s) } catch (_) {}
   return { name: '', phone: '', email: '', role: sessionStorage.getItem('ptp_role') || '' }
@@ -36,8 +32,13 @@ export default function RegisterStep1() {
   const [form, setForm] = useState(getInitial)
   const [errors, setErrors] = useState({})
   const [showErrorBanner, setShowErrorBanner] = useState(false)
+  const [saving, setSaving] = useState(false)
   const timeoutRef = useRef(null)
-  const { remaining, isSoldOut, loading: capLoading } = useCapacity()
+  const { remaining, isSoldOut } = useCapacity()
+
+  const pitcherFull = isSoldOut.pitcher_male && isSoldOut.pitcher_female
+  const watcherFull = isSoldOut.watcher
+  const selectedIsFull = (form.role === 'pitcher' && pitcherFull) || (form.role === 'watcher' && watcherFull)
 
   useEffect(() => {
     return () => {
@@ -63,19 +64,39 @@ export default function RegisterStep1() {
     return e
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const errs = validate()
     if (Object.keys(errs).length) {
       setErrors(errs)
       setShowErrorBanner(true)
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
-      timeoutRef.current = setTimeout(() => {
-        setShowErrorBanner(false)
-      }, 3000)
+      timeoutRef.current = setTimeout(() => setShowErrorBanner(false), 3000)
       return
     }
     setShowErrorBanner(false)
+
+    // If sold out → save as waitlist, skip payment
+    if (selectedIsFull) {
+      setSaving(true)
+      try {
+        await supabase.from('registrations').insert({
+          name: form.name,
+          whatsapp: form.phone,
+          email: form.email,
+          role: form.role,
+          status: 'waitlist',
+        })
+      } catch (err) {
+        console.error('Waitlist save error:', err)
+      }
+      setSaving(false)
+      sessionStorage.removeItem('ptp_step1')
+      navigate('/waitlist')
+      return
+    }
+
+    // Normal flow
     sessionStorage.setItem('ptp_step1', JSON.stringify(form))
     navigate(form.role === 'pitcher' ? '/register/pitcher' : '/register/watcher')
   }
@@ -120,44 +141,30 @@ export default function RegisterStep1() {
           <ChipGroup
             label="How are you joining Pitch Them Perfect?"
             options={[
-              { 
-                value: 'pitcher', 
-                label: "I'm here to pitch someone", 
-                icon: <MicIcon />,
-                sub: isSoldOut.pitcher_male && isSoldOut.pitcher_female
-                  ? 'Pitcher slots full'
-                  : `${remaining.pitcher_male + remaining.pitcher_female} slots left`,
-                disabled: isSoldOut.pitcher_male && isSoldOut.pitcher_female
-              },
-              { 
-                value: 'watcher', 
-                label: "I'm here to watch the pitches", 
-                icon: <EyeIcon />,
-                sub: isSoldOut.watcher
-                  ? 'Sold out' 
-                  : `${remaining.watcher} slots left`,
-                disabled: isSoldOut.watcher
-              },
+              { value: 'pitcher', label: "I'm here to pitch someone", icon: <MicIcon /> },
+              { value: 'watcher', label: "I'm here to watch the pitches", icon: <EyeIcon /> },
             ]}
             value={form.role}
-            onChange={v => {
-              const opt = [
-                { value: 'pitcher', disabled: isSoldOut.pitcher_male && isSoldOut.pitcher_female },
-                { value: 'watcher', disabled: isSoldOut.watcher },
-              ].find(o => o.value === v)
-              if (opt?.disabled) return
-              set('role', v)
-            }}
+            onChange={v => set('role', v)}
             required
             error={errors.role}
             roleStyle
           />
+          {selectedIsFull && (
+            <div className="waitlist-notice">
+              <p className="waitlist-notice-title">This category is currently full.</p>
+              <p className="waitlist-notice-desc">
+                You can still join the waitlist — we'll prioritise you if spots open up.
+                No payment needed right now.
+              </p>
+            </div>
+          )}
         </FormCard>
 
         <div className="submit-wrapper">
           {showErrorBanner && <ErrorBanner />}
-          <button id="btn-continue" type="submit" className="btn-primary">
-            Continue &nbsp;→
+          <button id="btn-continue" type="submit" className="btn-primary" disabled={saving}>
+            {saving ? 'Saving...' : selectedIsFull ? 'Join Waitlist' : 'Continue \u00A0→'}
           </button>
         </div>
       </form>

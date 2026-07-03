@@ -395,6 +395,7 @@ export default function AdminPage() {
       pitchersFemale: pitchers.filter(r => r.pitchee_gender === 'female').length,
       paidWatchers: watchers.filter(r => r.status === 'paid').length,
       pendingWatchers: watchers.filter(r => r.status === 'pending').length,
+      waitlist: data.filter(r => r.status === 'waitlist').length,
       watchersTotal: watchers.length,
     }
   }, [data])
@@ -551,6 +552,7 @@ export default function AdminPage() {
             { label: 'Watchers', val: stats.watchersTotal, color: '#E8386D', icon: '👁', sub: `cap: ${capWatcherInput}` },
             { label: 'Paid', val: stats.paidWatchers, color: '#2E7D32', icon: '✅', sub: null },
             { label: 'Pending', val: stats.pendingWatchers, color: '#F57F17', icon: '⏳', sub: null },
+            { label: 'Waitlist', val: stats.waitlist, color: '#B8860B', icon: '📋', sub: 'overflow' },
           ].map(s => (
             <div key={s.label} style={{ 
               background: '#FFF', 
@@ -949,7 +951,8 @@ export default function AdminPage() {
                   { value: 'all', label: 'All' },
                   { value: 'paid', label: 'Paid' },
                   { value: 'pitch', label: 'Pitch' },
-                  { value: 'pending', label: 'Pending' }
+                  { value: 'pending', label: 'Pending' },
+                  { value: 'waitlist', label: 'Waitlist' }
                 ].map(opt => (
                   <button
                     key={opt.value}
@@ -1040,9 +1043,9 @@ export default function AdminPage() {
                           fontSize: 11,
                           fontWeight: 700,
                           textTransform: 'uppercase',
-                          background: row.status === 'paid' ? '#E8F5E9' : row.status === 'pitch' ? '#FFF0F4' : '#FFFDE7',
-                          color: row.status === 'paid' ? '#2E7D32' : row.status === 'pitch' ? '#E8386D' : '#F57F17',
-                          border: `1px solid ${row.status === 'paid' ? '#C8E6C9' : row.status === 'pitch' ? '#FCD4E0' : '#FFF9C4'}`
+                          background: row.status === 'paid' ? '#E8F5E9' : row.status === 'pitch' ? '#FFF0F4' : row.status === 'waitlist' ? '#FFFBF0' : '#FFFDE7',
+                          color: row.status === 'paid' ? '#2E7D32' : row.status === 'pitch' ? '#E8386D' : row.status === 'waitlist' ? '#B8860B' : '#F57F17',
+                          border: `1px solid ${row.status === 'paid' ? '#C8E6C9' : row.status === 'pitch' ? '#FCD4E0' : row.status === 'waitlist' ? '#F5E6C8' : '#FFF9C4'}`
                         }}>
                           {row.status}
                         </span>
