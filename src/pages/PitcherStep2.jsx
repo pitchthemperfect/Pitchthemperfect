@@ -20,9 +20,14 @@ const ATTEND_OPTIONS = [
   { value: 'no',  label: 'No' },
 ]
 
+const GENDER_OPTIONS = [
+  { value: 'male',   label: 'Male' },
+  { value: 'female', label: 'Female' },
+]
+
 function getInitial() {
   try { const s = sessionStorage.getItem('ptp_pitcher2'); if (s) return JSON.parse(s) } catch (_) {}
-  return { theirName: '', instagram: '', relationship: '', canAttend: '', pitch: '', links: '', consent: false }
+  return { theirName: '', instagram: '', pitcheeGender: '', relationship: '', canAttend: '', pitch: '', links: '', consent: false }
 }
 
 export default function PitcherStep2() {
@@ -51,6 +56,7 @@ export default function PitcherStep2() {
     if (!form.theirName.trim()) e.theirName    = 'Please enter their name and age'
     if (!form.instagram.trim()) e.instagram    = 'Please enter their Instagram handle'
     if (!form.relationship)     e.relationship = 'Please select your relationship'
+    if (!form.pitcheeGender)    e.pitcheeGender = 'Please select their gender'
     if (!form.canAttend)        e.canAttend    = 'Please answer this'
     if (!form.pitch.trim())     e.pitch        = 'Please write your pitch'
     if (!form.consent)          e.consent      = 'Please accept to continue'
@@ -82,7 +88,7 @@ export default function PitcherStep2() {
       desc="Register your interest for the next edition of Pitch Them Perfect. Whether you're here to take the mic or watch the magic happen, we want to hear from you."
       step={2}
     >
-      <BackButton to="/register" />
+      <BackButton to="/registration" />
 
       <form onSubmit={handleSubmit} noValidate style={{ display: 'contents' }}>
         <FormCard number="2" title="Your Pitch">
@@ -110,6 +116,15 @@ export default function PitcherStep2() {
             onChange={v => set('relationship', v)}
             required
             error={errors.relationship}
+          />
+
+          <ChipGroup
+            label="Their Gender"
+            options={GENDER_OPTIONS}
+            value={form.pitcheeGender}
+            onChange={v => set('pitcheeGender', v)}
+            required
+            error={errors.pitcheeGender}
           />
 
           <ChipGroup
@@ -149,7 +164,7 @@ export default function PitcherStep2() {
           onChange={v => set('consent', v)}
           error={errors.consent}
         >
-          I'm happy for Pitch Them Perfect to contact me via WhatsApp and email about this event and future editions. <span className="req">*</span>
+          I confirm I have my friend's permission to nominate them. <span className="req">*</span>
         </ConsentCheckbox>
 
         <div className="submit-wrapper">

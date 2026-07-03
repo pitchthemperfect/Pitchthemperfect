@@ -4,6 +4,7 @@ import PageShell from '../components/PageShell'
 import FormCard from '../components/FormCard'
 import ChipGroup from '../components/ChipGroup'
 import ErrorBanner from '../components/ErrorBanner'
+import { useCapacity } from '../hooks/useCapacity'
 
 const MicIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="role-icon">
@@ -36,6 +37,7 @@ export default function RegisterStep1() {
   const [errors, setErrors] = useState({})
   const [showErrorBanner, setShowErrorBanner] = useState(false)
   const timeoutRef = useRef(null)
+  const { remaining, isSoldOut, loading: capLoading } = useCapacity()
 
   useEffect(() => {
     return () => {
@@ -117,9 +119,35 @@ export default function RegisterStep1() {
         <FormCard number="2" title="Pick Your Role">
           <ChipGroup
             label="How are you joining Pitch Them Perfect?"
-            options={ROLE_OPTIONS}
+            options={[
+              { 
+                value: 'pitcher', 
+                label: "I'm here to pitch someone", 
+                icon: <MicIcon />,
+                sub: isSoldOut.pitcher_male && isSoldOut.pitcher_female
+                  ? 'Pitcher slots full'
+                  : `${remaining.pitcher_male + remaining.pitcher_female} slots left`,
+                disabled: isSoldOut.pitcher_male && isSoldOut.pitcher_female
+              },
+              { 
+                value: 'watcher', 
+                label: "I'm here to watch the pitches", 
+                icon: <EyeIcon />,
+                sub: isSoldOut.watcher
+                  ? 'Sold out' 
+                  : `${remaining.watcher} slots left`,
+                disabled: isSoldOut.watcher
+              },
+            ]}
             value={form.role}
-            onChange={v => set('role', v)}
+            onChange={v => {
+              const opt = [
+                { value: 'pitcher', disabled: isSoldOut.pitcher_male && isSoldOut.pitcher_female },
+                { value: 'watcher', disabled: isSoldOut.watcher },
+              ].find(o => o.value === v)
+              if (opt?.disabled) return
+              set('role', v)
+            }}
             required
             error={errors.role}
             roleStyle

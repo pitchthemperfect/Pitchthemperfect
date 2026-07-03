@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import LandingPage from './pages/LandingPage'
 import RegisterStep1 from './pages/RegisterStep1'
 import WatcherStep2 from './pages/WatcherStep2'
 import PitcherStep2 from './pages/PitcherStep2'
@@ -12,8 +13,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<RegisterStep1 />} />
-        <Route path="/register" element={<Navigate to="/" replace />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/registration" element={<RegisterStep1 />} />
+        <Route path="/register" element={<Navigate to="/registration" replace />} />
         <Route path="/register/watcher" element={<WatcherStep2 />} />
         <Route path="/register/pitcher" element={<PitcherStep2 />} />
         <Route path="/register/pitcher/success" element={<PitcherSuccess />} />

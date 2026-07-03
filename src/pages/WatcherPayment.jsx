@@ -78,6 +78,8 @@ export default function WatcherPayment() {
       const step2 = JSON.parse(sessionStorage.getItem('ptp_watcher2') || '{}')
       
       if (step1.name) {
+        // TODO: After Ziina Edge Function is live, status stays 'pending'
+        // until the webhook confirms payment and updates to 'paid'.
         const { error } = await supabase.from('registrations').insert({
           name: step1.name,
           whatsapp: step1.phone || '',
@@ -85,7 +87,7 @@ export default function WatcherPayment() {
           role: 'watcher',
           gender: step2.gender || '',
           age_group: step2.age || '',
-          status: 'paid',
+          status: 'pending',
           amount: `AED ${ticketPrice}`
         })
         if (error) {

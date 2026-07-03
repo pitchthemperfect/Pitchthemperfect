@@ -87,6 +87,15 @@ export default function AdminPage() {
   const [isSavingPrices, setIsSavingPrices] = useState(false)
   const [pricingSaveMessage, setPricingSaveMessage] = useState('')
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [eventDateInput, setEventDateInput] = useState('')
+  const [eventLocationInput, setEventLocationInput] = useState('')
+  const [gallery1Input, setGallery1Input] = useState('')
+  const [gallery2Input, setGallery2Input] = useState('')
+  const [gallery3Input, setGallery3Input] = useState('')
+  const [gallery4Input, setGallery4Input] = useState('')
+  const [capPitcherMaleInput, setCapPitcherMaleInput] = useState('5')
+  const [capPitcherFemaleInput, setCapPitcherFemaleInput] = useState('5')
+  const [capWatcherInput, setCapWatcherInput] = useState('60')
 
   useEffect(() => {
     const checkActiveSession = async () => {
@@ -125,7 +134,7 @@ export default function AdminPage() {
             email: r.email,
             role: r.role,
             details: r.role === 'pitcher' 
-              ? `Nominated: ${r.their_name || ''} (${r.relationship || ''}). Instagram: ${r.instagram || ''}. Can attend: ${r.can_attend || ''}. Pitch: ${r.pitch || ''}.${r.links ? ` Links: ${r.links}` : ''}`
+              ? `Nominated: ${r.their_name || ''} (${r.pitchee_gender || ''}, ${r.relationship || ''}). Instagram: ${r.instagram || ''}. Can attend: ${r.can_attend || ''}. Pitch: ${r.pitch || ''}.${r.links ? ` Links: ${r.links}` : ''}`
               : `Gender: ${r.gender || ''}, Age: ${r.age_group || ''}`,
             status: r.status,
             date: r.created_at ? new Date(r.created_at).toLocaleString('en-US', {
@@ -166,14 +175,45 @@ export default function AdminPage() {
           if (pitcherPriceSetting) setPitcherPriceInput(pitcherPriceSetting.value)
           if (watcherUrlSetting) setWatcherUrlInput(watcherUrlSetting.value)
           if (pitcherUrlSetting) setPitcherUrlInput(pitcherUrlSetting.value)
+
+          const dateSetting = settingsData.find(s => s.key === 'event_date')
+          const locSetting = settingsData.find(s => s.key === 'event_location')
+          if (dateSetting) setEventDateInput(dateSetting.value)
+          if (locSetting) setEventLocationInput(locSetting.value)
+
+          const g1 = settingsData.find(s => s.key === 'gallery_photo_1')
+          const g2 = settingsData.find(s => s.key === 'gallery_photo_2')
+          const g3 = settingsData.find(s => s.key === 'gallery_photo_3')
+          const g4 = settingsData.find(s => s.key === 'gallery_photo_4')
+          if (g1) setGallery1Input(g1.value)
+          if (g2) setGallery2Input(g2.value)
+          if (g3) setGallery3Input(g3.value)
+          if (g4) setGallery4Input(g4.value)
         }
       } catch (err) {
         console.error('Error fetching prices in Admin page:', err)
       }
     }
 
+    const fetchEventCaps = async () => {
+      try {
+        const { data: events } = await supabase
+          .from('events')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false })
+          .limit(1)
+        if (events && events.length > 0) {
+          setCapPitcherMaleInput(String(events[0].cap_pitcher_male))
+          setCapPitcherFemaleInput(String(events[0].cap_pitcher_female))
+          setCapWatcherInput(String(events[0].cap_watcher))
+        }
+      } catch (_) {}
+    }
+
     fetchRegistrations()
     fetchPrices()
+    fetchEventCaps()
   }, [isAuthenticated])
 
   const handleSavePrices = async (e) => {
@@ -185,39 +225,96 @@ export default function AdminPage() {
       // Update watcher price
       const { error: wError } = await supabase
         .from('settings')
-        .update({ value: watcherPriceInput })
-        .eq('key', 'watcher_price')
+        .upsert({ key: 'watcher_price', value: watcherPriceInput }, { onConflict: 'key' })
         
       // Update pitcher price
       const { error: pError } = await supabase
         .from('settings')
-        .update({ value: pitcherPriceInput })
-        .eq('key', 'pitcher_price')
+        .upsert({ key: 'pitcher_price', value: pitcherPriceInput }, { onConflict: 'key' })
 
       // Update watcher URL
       const { error: wUrlError } = await supabase
         .from('settings')
-        .update({ value: watcherUrlInput })
-        .eq('key', 'watcher_payment_url')
+        .upsert({ key: 'watcher_payment_url', value: watcherUrlInput }, { onConflict: 'key' })
         
       // Update pitcher URL
       const { error: pUrlError } = await supabase
         .from('settings')
-        .update({ value: pitcherUrlInput })
-        .eq('key', 'pitcher_payment_url')
+        .upsert({ key: 'pitcher_payment_url', value: pitcherUrlInput }, { onConflict: 'key' })
 
-      if (wError || pError || wUrlError || pUrlError) {
+      // Update event date
+      const { error: dateError } = await supabase
+        .from('settings')
+        .upsert({ key: 'event_date', value: eventDateInput }, { onConflict: 'key' })
+
+      // Update event location
+      const { error: locError } = await supabase
+        .from('settings')
+        .upsert({ key: 'event_location', value: eventLocationInput }, { onConflict: 'key' })
+
+      // Update gallery photos
+      const { error: g1Error } = await supabase
+        .from('settings')
+        .upsert({ key: 'gallery_photo_1', value: gallery1Input }, { onConflict: 'key' })
+
+      const { error: g2Error } = await supabase
+        .from('settings')
+        .upsert({ key: 'gallery_photo_2', value: gallery2Input }, { onConflict: 'key' })
+
+      const { error: g3Error } = await supabase
+        .from('settings')
+        .upsert({ key: 'gallery_photo_3', value: gallery3Input }, { onConflict: 'key' })
+
+      const { error: g4Error } = await supabase
+        .from('settings')
+        .upsert({ key: 'gallery_photo_4', value: gallery4Input }, { onConflict: 'key' })
+
+      if (wError || pError || wUrlError || pUrlError || dateError || locError || g1Error || g2Error || g3Error || g4Error) {
         throw new Error(
           wError?.message || 
           pError?.message || 
           wUrlError?.message || 
-          pUrlError?.message || 
+          pUrlError?.message ||
+          dateError?.message ||
+          locError?.message ||
+          g1Error?.message ||
+          g2Error?.message ||
+          g3Error?.message ||
+          g4Error?.message ||
           'Failed to save settings'
         )
       }
       
-      setPricingSaveMessage('✓ Pricing & URLs saved!')
+      setPricingSaveMessage('✓ Settings saved!')
       setTimeout(() => setPricingSaveMessage(''), 3000)
+
+      // Save capacity caps to active event
+      const { data: events } = await supabase
+        .from('events')
+        .select('id')
+        .eq('is_active', true)
+        .limit(1)
+      if (events && events.length > 0) {
+        await supabase
+          .from('events')
+          .update({
+            cap_pitcher_male: parseInt(capPitcherMaleInput) || 0,
+            cap_pitcher_female: parseInt(capPitcherFemaleInput) || 0,
+            cap_watcher: parseInt(capWatcherInput) || 0,
+          })
+          .eq('id', events[0].id)
+      } else {
+        // No active event — create one
+        await supabase
+          .from('events')
+          .insert({
+            show_date: new Date().toISOString().split('T')[0],
+            cap_pitcher_male: parseInt(capPitcherMaleInput) || 5,
+            cap_pitcher_female: parseInt(capPitcherFemaleInput) || 5,
+            cap_watcher: parseInt(capWatcherInput) || 60,
+            is_active: true,
+          })
+      }
     } catch (err) {
       console.error('Failed to update settings:', err)
       setPricingSaveMessage('❌ Error: ' + err.message)
@@ -289,11 +386,16 @@ export default function AdminPage() {
 
   // Count summaries
   const stats = useMemo(() => {
+    const pitchers = data.filter(r => r.role === 'pitcher')
+    const watchers = data.filter(r => r.role === 'watcher')
     return {
       total: data.length,
-      pitchers: data.filter(r => r.role === 'pitcher').length,
-      paidWatchers: data.filter(r => r.role === 'watcher' && r.status === 'paid').length,
-      pendingWatchers: data.filter(r => r.role === 'watcher' && r.status === 'pending').length
+      pitchers: pitchers.length,
+      pitchersMale: pitchers.filter(r => r.pitchee_gender !== 'female').length,
+      pitchersFemale: pitchers.filter(r => r.pitchee_gender === 'female').length,
+      paidWatchers: watchers.filter(r => r.status === 'paid').length,
+      pendingWatchers: watchers.filter(r => r.status === 'pending').length,
+      watchersTotal: watchers.length,
     }
   }, [data])
 
@@ -441,28 +543,31 @@ export default function AdminPage() {
         </div>
 
         {/* Stats Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
           {[
-            { label: 'Total Signups', val: stats.total, color: '#111111', icon: '👥', bg: '#FFF' },
-            { label: 'Pitchers Nominated', val: stats.pitchers, color: '#E8386D', icon: '🎤', bg: '#FFF' },
-            { label: 'Paid Watchers', val: stats.paidWatchers, color: '#E8386D', icon: '👁', bg: '#FFF' },
-            { label: 'Pending Watchers', val: stats.pendingWatchers, color: '#AAAAAA', icon: '⏳', bg: '#FFF' }
+            { label: 'Total Signups', val: stats.total, color: '#111111', icon: '👥', sub: null },
+            { label: 'Pitchers (M)', val: stats.pitchersMale, color: '#E8386D', icon: '🎤♂️', sub: `cap: ${capPitcherMaleInput}` },
+            { label: 'Pitchers (F)', val: stats.pitchersFemale, color: '#E8386D', icon: '🎤♀️', sub: `cap: ${capPitcherFemaleInput}` },
+            { label: 'Watchers', val: stats.watchersTotal, color: '#E8386D', icon: '👁', sub: `cap: ${capWatcherInput}` },
+            { label: 'Paid', val: stats.paidWatchers, color: '#2E7D32', icon: '✅', sub: null },
+            { label: 'Pending', val: stats.pendingWatchers, color: '#F57F17', icon: '⏳', sub: null },
           ].map(s => (
             <div key={s.label} style={{ 
-              background: s.bg, 
-              padding: 24, 
-              borderRadius: 16, 
+              background: '#FFF', 
+              padding: '20px 18px', 
+              borderRadius: 14, 
               border: '1.5px solid #FCD4E0', 
-              boxShadow: '0 4px 12px rgba(0,0,0,0.01)',
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
+              gap: 10
             }}>
               <div>
-                <p style={{ fontSize: 11, textTransform: 'uppercase', color: '#888', fontWeight: 700, letterSpacing: '0.08em', marginBottom: 8 }}>{s.label}</p>
-                <p style={{ fontSize: 36, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.val}</p>
+                <p style={{ fontSize: 10.5, textTransform: 'uppercase', color: '#999', fontWeight: 700, letterSpacing: '0.06em', marginBottom: 4 }}>{s.label}</p>
+                <p style={{ fontSize: 30, fontWeight: 900, color: s.color, lineHeight: 1, marginBottom: s.sub ? 2 : 0 }}>{s.val}</p>
+                {s.sub && <p style={{ fontSize: 10.5, color: '#BBB', fontWeight: 500 }}>{s.sub}</p>}
               </div>
-              <span style={{ fontSize: 32, opacity: 0.8 }}>{s.icon}</span>
+              <span style={{ fontSize: 26, opacity: 0.7 }}>{s.icon}</span>
             </div>
           ))}
         </div>
@@ -521,7 +626,7 @@ export default function AdminPage() {
                   Event Settings Configuration
                 </h2>
               </div>
-              <p style={{ fontSize: 13, color: '#666', margin: '4px 0 0 0' }}>Configure current ticket prices and payment URLs shown on checkout forms.</p>
+              <p style={{ fontSize: 13, color: '#666', margin: '4px 0 0 0' }}>Configure event details, ticket prices, and payment URLs.</p>
               
               <form onSubmit={handleSavePrices} style={{ display: 'flex', flexDirection: 'column', gap: 20, marginTop: 20 }}>
                 <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
@@ -606,6 +711,147 @@ export default function AdminPage() {
                       required
                     />
                   </div>
+                </div>
+
+                <div style={{ borderTop: '1.5px solid #F0F0F0', paddingTop: 4, marginTop: 4 }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#999', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Event Landing Page</p>
+                  <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+                    <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <label style={{ fontSize: 12.5, fontWeight: 700, color: '#444' }}>Event Date</label>
+                      <input 
+                        type="text" 
+                        value={eventDateInput} 
+                        onChange={e => setEventDateInput(e.target.value)}
+                        placeholder="e.g. August 16, 2026"
+                        style={{ 
+                          width: '100%',
+                          padding: '10px 12px', 
+                          border: '1.5px solid #EBEBEB', 
+                          borderRadius: 8, 
+                          fontSize: 13.5, 
+                          fontFamily: 'inherit',
+                          outline: 'none',
+                          boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.03)'
+                        }}
+                      />
+                    </div>
+
+                    <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <label style={{ fontSize: 12.5, fontWeight: 700, color: '#444' }}>Event Location</label>
+                      <input 
+                        type="text" 
+                        value={eventLocationInput} 
+                        onChange={e => setEventLocationInput(e.target.value)}
+                        placeholder="e.g. Dubai"
+                        style={{ 
+                          width: '100%',
+                          padding: '10px 12px', 
+                          border: '1.5px solid #EBEBEB', 
+                          borderRadius: 8, 
+                          fontSize: 13.5, 
+                          fontFamily: 'inherit',
+                          outline: 'none',
+                          boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.03)'
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ borderTop: '1.5px solid #F0F0F0', paddingTop: 4, marginTop: 4 }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#999', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Capacity Limits</p>
+                  <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+                    <div style={{ flex: '1 1 150px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <label style={{ fontSize: 12.5, fontWeight: 700, color: '#444' }}>Pitcher — Male</label>
+                      <input type="number" min="0" value={capPitcherMaleInput}
+                        onChange={e => setCapPitcherMaleInput(e.target.value)}
+                        style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #EBEBEB', borderRadius: 8, fontSize: 13.5, fontFamily: 'inherit', outline: 'none' }} />
+                      <span style={{ fontSize: 11, color: stats.pitchersMale >= parseInt(capPitcherMaleInput) ? '#E8386D' : '#999', fontWeight: 600 }}>
+                        {stats.pitchersMale} used · {Math.max(0, parseInt(capPitcherMaleInput) - stats.pitchersMale)} left
+                      </span>
+                    </div>
+                    <div style={{ flex: '1 1 150px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <label style={{ fontSize: 12.5, fontWeight: 700, color: '#444' }}>Pitcher — Female</label>
+                      <input type="number" min="0" value={capPitcherFemaleInput}
+                        onChange={e => setCapPitcherFemaleInput(e.target.value)}
+                        style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #EBEBEB', borderRadius: 8, fontSize: 13.5, fontFamily: 'inherit', outline: 'none' }} />
+                      <span style={{ fontSize: 11, color: stats.pitchersFemale >= parseInt(capPitcherFemaleInput) ? '#E8386D' : '#999', fontWeight: 600 }}>
+                        {stats.pitchersFemale} used · {Math.max(0, parseInt(capPitcherFemaleInput) - stats.pitchersFemale)} left
+                      </span>
+                    </div>
+                    <div style={{ flex: '1 1 150px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <label style={{ fontSize: 12.5, fontWeight: 700, color: '#444' }}>Watcher</label>
+                      <input type="number" min="0" value={capWatcherInput}
+                        onChange={e => setCapWatcherInput(e.target.value)}
+                        style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #EBEBEB', borderRadius: 8, fontSize: 13.5, fontFamily: 'inherit', outline: 'none' }} />
+                      <span style={{ fontSize: 11, color: stats.watchersTotal >= parseInt(capWatcherInput) ? '#E8386D' : '#999', fontWeight: 600 }}>
+                        {stats.watchersTotal} used · {Math.max(0, parseInt(capWatcherInput) - stats.watchersTotal)} left
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ borderTop: '1.5px solid #F0F0F0', paddingTop: 4, marginTop: 4 }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#999', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Gallery Photos</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                    {[
+                      { label: 'Photo 1 — Main (portrait)',  val: gallery1Input, set: setGallery1Input, slot: 1 },
+                      { label: 'Photo 2 — Square',           val: gallery2Input, set: setGallery2Input, slot: 2 },
+                      { label: 'Photo 3 — Square',           val: gallery3Input, set: setGallery3Input, slot: 3 },
+                      { label: 'Photo 4 — Wide',             val: gallery4Input, set: setGallery4Input, slot: 4 },
+                    ].map(g => {
+                      const handleUpload = async (e) => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        try {
+                          g.set('__uploading__')
+                          const path = `gallery_${g.slot}_${Date.now()}.${file.name.split('.').pop()}`
+                          const { error } = await supabase.storage.from('photos').upload(path, file)
+                          if (error) throw error
+                          const { data: { publicUrl } } = supabase.storage.from('photos').getPublicUrl(path)
+                          g.set(publicUrl)
+                        } catch (err) {
+                          console.error('Upload failed:', err)
+                          g.set('')
+                        }
+                      }
+                      const isUploading = g.val === '__uploading__'
+                      return (
+                        <div key={g.slot} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          <label style={{ fontSize: 12.5, fontWeight: 700, color: '#444' }}>{g.label}</label>
+                          {g.val && !isUploading ? (
+                            <div style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', border: '1.5px solid #F0F0F0' }}>
+                              <img src={g.val} alt={g.label} style={{ width: '100%', height: 120, objectFit: 'cover', display: 'block' }} />
+                              <button
+                                type="button"
+                                onClick={() => g.set('')}
+                                style={{
+                                  position: 'absolute', top: 6, right: 6,
+                                  background: 'rgba(0,0,0,0.6)', color: '#fff', border: 'none',
+                                  borderRadius: 6, width: 24, height: 24, cursor: 'pointer',
+                                  fontSize: 12, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}
+                              >✕</button>
+                            </div>
+                          ) : (
+                            <label style={{
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              height: 80, border: '1.5px dashed #DCDCDC', borderRadius: 10,
+                              cursor: 'pointer', color: isUploading ? '#E8386D' : '#999',
+                              fontSize: 12.5, fontWeight: 600, gap: 6,
+                              background: isUploading ? '#FFF5F8' : '#FAFAFA',
+                              transition: 'all .15s'
+                            }}>
+                              {isUploading ? '⏳ Uploading...' : '📷 Choose photo'}
+                              <input type="file" accept="image/*" onChange={handleUpload}
+                                style={{ display: 'none' }} disabled={isUploading} />
+                            </label>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <p style={{ fontSize: 11, color: '#AAA', marginTop: 4 }}>Uploaded to Supabase Storage — public bucket.</p>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginTop: 4 }}>

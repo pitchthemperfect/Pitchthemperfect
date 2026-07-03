@@ -97,12 +97,15 @@ export default function PitcherPayment() {
       const step2 = JSON.parse(sessionStorage.getItem('ptp_pitcher2') || '{}')
       
       if (step1.name) {
+        // TODO: After Ziina Edge Function is live, change status to 'pending'
+        // and let the webhook update it to 'confirmed' upon payment verification.
         const { error } = await supabase.from('registrations').insert({
           name: step1.name,
           whatsapp: step1.phone || '',
           email: step1.email,
           role: 'pitcher',
           relationship: step2.relationship || '',
+          pitchee_gender: step2.pitcheeGender || '',
           instagram: step2.instagram || '',
           their_name: step2.theirName || '',
           can_attend: step2.canAttend || '',

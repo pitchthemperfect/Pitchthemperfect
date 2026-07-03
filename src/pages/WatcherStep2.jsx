@@ -79,7 +79,7 @@ export default function WatcherStep2() {
       desc="Register your interest for the next edition of Pitch Them Perfect. Whether you're here to take the mic or watch the magic happen, we want to hear from you."
       step={2}
     >
-      <BackButton to="/register" />
+      <BackButton to="/registration" />
 
       <form onSubmit={handleSubmit} noValidate style={{ display: 'contents' }}>
         <FormCard number="2" title="Audience Details">
