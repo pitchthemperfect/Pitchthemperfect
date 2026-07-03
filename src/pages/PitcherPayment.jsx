@@ -108,7 +108,8 @@ export default function PitcherPayment() {
           can_attend: step2.canAttend || '',
           pitch: step2.pitch || '',
           status: 'pitch',
-          amount: `AED ${ticketPrice}`
+          amount: `AED ${ticketPrice}`,
+          links: step2.links || ''
         })
         if (error) {
           console.error('Supabase error inserting pitcher:', error)

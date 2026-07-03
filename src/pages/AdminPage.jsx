@@ -125,8 +125,8 @@ export default function AdminPage() {
             email: r.email,
             role: r.role,
             details: r.role === 'pitcher' 
-              ? `Nominated: ${r.their_name || ''}. ${r.relationship || ''}. Can attend: ${r.can_attend || ''}. Pitch: ${r.pitch || ''}`
-              : `${r.gender || ''}, ${r.age_group || ''}`,
+              ? `Nominated: ${r.their_name || ''} (${r.relationship || ''}). Instagram: ${r.instagram || ''}. Can attend: ${r.can_attend || ''}. Pitch: ${r.pitch || ''}.${r.links ? ` Links: ${r.links}` : ''}`
+              : `Gender: ${r.gender || ''}, Age: ${r.age_group || ''}`,
             status: r.status,
             date: r.created_at ? new Date(r.created_at).toLocaleString('en-US', {
               year: 'numeric',

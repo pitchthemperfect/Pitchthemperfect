@@ -84,7 +84,7 @@ export default function WatcherPayment() {
           email: step1.email,
           role: 'watcher',
           gender: step2.gender || '',
-          age_group: step2.ageGroup || '',
+          age_group: step2.age || '',
           status: 'paid',
           amount: `AED ${ticketPrice}`
         })
