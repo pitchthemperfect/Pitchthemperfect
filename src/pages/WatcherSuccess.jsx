@@ -1,4 +1,6 @@
 import PageShell from '../components/PageShell'
+import { useEffect } from 'react'
+import { trackPurchase } from '../lib/tracking'
 
 const SuccessCheckIcon = () => (
   <svg width="56" height="56" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -38,6 +40,7 @@ const HangerIcon = () => (
 )
 
 export default function WatcherSuccess() {
+  useEffect(() => { trackPurchase({ role: 'watcher' }) }, [])
   return (
     <PageShell
       badge="You're In!"

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../utils/supabaseClient'
+import { trackLead } from '../lib/tracking'
 
 const HeartIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'block' }}>
@@ -82,6 +83,7 @@ export default function LandingPage() {
   }, [])
 
   const goToRegister = (role) => {
+    trackLead({ role })
     sessionStorage.setItem('ptp_role', role)
     navigate('/registration')
   }

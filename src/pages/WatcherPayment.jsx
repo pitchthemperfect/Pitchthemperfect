@@ -4,6 +4,7 @@ import PageShell from '../components/PageShell'
 import FormCard from '../components/FormCard'
 import BackButton from '../components/BackButton'
 import { supabase } from '../utils/supabaseClient'
+import { trackCompleteRegistration } from '../lib/tracking'
 
 const MicOutlineIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8386D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
@@ -93,6 +94,7 @@ export default function WatcherPayment() {
         if (error) {
           console.error('Supabase error inserting watcher:', error)
         }
+        trackCompleteRegistration({ role: 'watcher' })
       }
     } catch (err) {
       console.error('Error saving watcher registration to Supabase:', err)

@@ -6,6 +6,7 @@ import ChipGroup from '../components/ChipGroup'
 import ErrorBanner from '../components/ErrorBanner'
 import { useCapacity } from '../hooks/useCapacity'
 import { supabase } from '../utils/supabaseClient'
+import { trackLead } from '../lib/tracking'
 
 const MicIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="role-icon">
@@ -80,6 +81,7 @@ export default function RegisterStep1() {
     if (selectedIsFull) {
       setSaving(true)
       try {
+        trackLead({ role: form.role, waitlist: true })
         await supabase.from('registrations').insert({
           name: form.name,
           whatsapp: form.phone,
@@ -97,6 +99,7 @@ export default function RegisterStep1() {
     }
 
     // Normal flow
+    trackLead({ role: form.role })
     sessionStorage.setItem('ptp_step1', JSON.stringify(form))
     navigate(form.role === 'pitcher' ? '/register/pitcher' : '/register/watcher')
   }

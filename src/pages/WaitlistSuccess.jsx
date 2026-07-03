@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 import PageShell from '../components/PageShell'
+import { trackLead } from '../lib/tracking'
 
 const ClockIcon = () => (
   <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -11,6 +13,7 @@ const ClockIcon = () => (
 
 export default function WaitlistSuccess() {
   const navigate = useNavigate()
+  useEffect(() => { trackLead({ role: 'waitlist' }) }, [])
 
   return (
     <PageShell
