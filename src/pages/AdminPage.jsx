@@ -137,6 +137,7 @@ export default function AdminPage() {
               ? `Nominated: ${r.their_name || ''} (${r.pitchee_gender || ''}, ${r.relationship || ''}). Instagram: ${r.instagram || ''}. Can attend: ${r.can_attend || ''}. Pitch: ${r.pitch || ''}.${r.links ? ` Links: ${r.links}` : ''}`
               : `Gender: ${r.gender || ''}, Age: ${r.age_group || ''}`,
             status: r.status,
+            attended: r.attended || false,
             date: r.created_at ? new Date(r.created_at).toLocaleString('en-US', {
               year: 'numeric',
               month: '2-digit',
@@ -367,6 +368,32 @@ export default function AdminPage() {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  const handleUpdateStatus = async (id, newStatus) => {
+    const { error } = await supabase
+      .from('registrations')
+      .update({ status: newStatus })
+      .eq('id', id)
+    if (error) {
+      console.error('Status update error:', error)
+      return
+    }
+    // Optimistic update
+    setData(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r))
+  }
+
+  const handleToggleAttended = async (id, current) => {
+    const newVal = !current
+    const { error } = await supabase
+      .from('registrations')
+      .update({ attended: newVal })
+      .eq('id', id)
+    if (error) {
+      console.error('Attended update error:', error)
+      return
+    }
+    setData(prev => prev.map(r => r.id === id ? { ...r, attended: newVal } : r))
   }
 
   // Filtered registrations list
@@ -995,20 +1022,22 @@ export default function AdminPage() {
                   <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Role</th>
                   <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Details</th>
                   <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Status</th>
+                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Attended</th>
                   <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Amount</th>
                   <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Registered At</th>
+                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="7" style={{ padding: '48px 20px', textAlign: 'center', color: '#888' }}>
+                    <td colSpan="9" style={{ padding: '48px 20px', textAlign: 'center', color: '#888' }}>
                       <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite', marginRight: 8 }}>⏳</span> Loading registrations from Supabase...
                     </td>
                   </tr>
                 ) : filteredData.length === 0 ? (
                   <tr>
-                    <td colSpan="7" style={{ padding: '48px 20px', textAlign: 'center', color: '#888' }}>
+                    <td colSpan="9" style={{ padding: '48px 20px', textAlign: 'center', color: '#888' }}>
                       No registration matching the filters found.
                     </td>
                   </tr>
@@ -1055,6 +1084,38 @@ export default function AdminPage() {
                       </td>
                       <td style={{ padding: '20px 20px', color: '#555' }}>
                         {row.date}
+                      </td>
+                      <td style={{ padding: '20px 20px' }}>
+                        {/* Attended checkbox */}
+                        <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 12, color: row.attended ? '#2E7D32' : '#AAA' }}>
+                          <input type="checkbox" checked={row.attended || false}
+                            onChange={() => handleToggleAttended(row.id, row.attended)}
+                            style={{ accentColor: '#E8386D', cursor: 'pointer' }} />
+                          {row.attended ? '✓ Yes' : 'Mark'}
+                        </label>
+                      </td>
+                      <td style={{ padding: '20px 20px' }}>
+                        {/* Actions: approve/decline for pitchers */}
+                        {row.role === 'pitcher' && (row.status === 'pitch' || row.status === 'waitlist') ? (
+                          <div style={{ display: 'flex', gap: 6 }}>
+                            <button onClick={() => handleUpdateStatus(row.id, 'confirmed')}
+                              style={{
+                                padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700,
+                                background: '#E8F5E9', color: '#2E7D32', border: '1px solid #C8E6C9', cursor: 'pointer'
+                              }}>✓ Approve</button>
+                            <button onClick={() => handleUpdateStatus(row.id, 'declined')}
+                              style={{
+                                padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700,
+                                background: '#FFEBEE', color: '#C62828', border: '1px solid #FFCDD2', cursor: 'pointer'
+                              }}>✕ Decline</button>
+                          </div>
+                        ) : row.role === 'pitcher' && row.status === 'confirmed' ? (
+                          <span style={{ fontSize: 11, color: '#2E7D32', fontWeight: 600 }}>Approved ✓</span>
+                        ) : row.role === 'pitcher' && row.status === 'declined' ? (
+                          <span style={{ fontSize: 11, color: '#C62828', fontWeight: 600 }}>Declined</span>
+                        ) : row.status === 'waitlist' ? (
+                          <span style={{ fontSize: 11, color: '#B8860B', fontWeight: 600 }}>On waitlist</span>
+                        ) : null}
                       </td>
                     </tr>
                   ))
