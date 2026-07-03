@@ -78,9 +78,9 @@ export default function WatcherPayment() {
       const step2 = JSON.parse(sessionStorage.getItem('ptp_watcher2') || '{}')
       
       if (step1.name) {
-        await supabase.from('registrations').insert({
+        const { error } = await supabase.from('registrations').insert({
           name: step1.name,
-          whatsapp: step1.whatsapp,
+          whatsapp: step1.phone || '',
           email: step1.email,
           role: 'watcher',
           gender: step2.gender || '',
@@ -88,6 +88,9 @@ export default function WatcherPayment() {
           status: 'paid',
           amount: `AED ${ticketPrice}`
         })
+        if (error) {
+          console.error('Supabase error inserting watcher:', error)
+        }
       }
     } catch (err) {
       console.error('Error saving watcher registration to Supabase:', err)

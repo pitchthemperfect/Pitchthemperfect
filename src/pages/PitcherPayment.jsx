@@ -97,9 +97,9 @@ export default function PitcherPayment() {
       const step2 = JSON.parse(sessionStorage.getItem('ptp_pitcher2') || '{}')
       
       if (step1.name) {
-        await supabase.from('registrations').insert({
+        const { error } = await supabase.from('registrations').insert({
           name: step1.name,
-          whatsapp: step1.whatsapp,
+          whatsapp: step1.phone || '',
           email: step1.email,
           role: 'pitcher',
           relationship: step2.relationship || '',
@@ -110,6 +110,9 @@ export default function PitcherPayment() {
           status: 'pitch',
           amount: `AED ${ticketPrice}`
         })
+        if (error) {
+          console.error('Supabase error inserting pitcher:', error)
+        }
       }
     } catch (err) {
       console.error('Error saving pitcher registration to Supabase:', err)
