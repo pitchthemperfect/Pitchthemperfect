@@ -42,7 +42,7 @@ const INCLUDED = [
   { icon: <SparklesOutlineIcon />, title: 'No Apps. No Swiping.', desc: 'Just real humans in a real room doing real romance.' },
 ]
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || ''
+const SUPABASE_URL = 'https://tnohztvpuflwkltkbphg.supabase.co'
 
 export default function WatcherPayment() {
   const navigate = useNavigate()

@@ -45,7 +45,7 @@ const INCLUDED = [
   { icon: <SparklesOutlineIcon />, title: 'Matchmaking Support', desc: 'Dedicated support during the social hour to help your friend connect with interested matches.' },
 ]
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || ''
+const SUPABASE_URL = 'https://tnohztvpuflwkltkbphg.supabase.co'
 
 export default function PitcherPayment() {
   const navigate = useNavigate()
