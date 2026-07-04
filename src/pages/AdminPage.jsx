@@ -598,6 +598,20 @@ export default function AdminPage() {
               📝 Story Cards
             </button>
             <button 
+              className="btn-submit-another" 
+              onClick={() => window.open('/live', '_blank')}
+              style={{ fontSize: 13, height: 38, padding: '0 16px', marginTop: 0 }}
+            >
+              📱 Live Form
+            </button>
+            <button 
+              className="btn-submit-another" 
+              onClick={() => window.open('/qr', '_blank')}
+              style={{ fontSize: 13, height: 38, padding: '0 16px', marginTop: 0 }}
+            >
+              🖨 Print QR
+            </button>
+            <button 
               onClick={handleLogout}
               style={{ 
                 fontSize: 13, 
