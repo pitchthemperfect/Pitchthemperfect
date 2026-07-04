@@ -110,24 +110,28 @@ export default function WatcherPayment() {
 
   useEffect(() => {
     if (!embeddedUrl) return
-    const handler = (e) => {
-      if (e.data === 'payment_complete' || e.origin === 'https://pay.ziina.com') {
-        navigate('/success/watcher')
-      }
+    // Ziina doesn't support iframe embedding — open in new tab
+    const w = window.open(embeddedUrl.replace('/embedded', ''), '_blank')
+    if (!w) {
+      window.location.href = embeddedUrl.replace('/embedded', '')
+    } else {
+      navigate('/success/watcher')
     }
-    window.addEventListener('message', handler)
-    return () => window.removeEventListener('message', handler)
   }, [embeddedUrl, navigate])
 
   if (embeddedUrl) {
     return (
-      <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', fontFamily: "'Inter', sans-serif", background: '#FAFAFA' }}>
-        <div style={{ padding: '16px 20px', background: '#fff', borderBottom: '1px solid #F0F0F0', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => { setEmbeddedUrl(''); setRegistered(false) }} style={{ background: 'none', border: 'none', fontSize: 14, color: '#888', cursor: 'pointer', fontFamily: 'inherit' }}>← Back</button>
-          <span style={{ fontSize: 14, fontWeight: 700, color: '#111' }}>Payment — AED {ticketPrice}</span>
+      <PageShell badge="Payment Opened" title="Complete Your Payment" titleNormal tagline="A payment window has been opened. Complete your payment there, then close this page.">
+        <div className="price-card">
+          <p className="price-amount" style={{ fontSize: 48 }}>💳</p>
+          <p style={{ fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 20 }}>
+            Payment opened in a new tab. Once complete, you can close this window.
+          </p>
+          <button className="btn-primary" onClick={() => navigate('/')} style={{ background: '#FFF', color: '#E8386D', border: '2px solid #E8386D' }}>
+            Back to Home
+          </button>
         </div>
-        <iframe src={embeddedUrl} style={{ flex: 1, border: 'none', width: '100%' }} title="Ziina Payment" />
-      </div>
+      </PageShell>
     )
   }
 
