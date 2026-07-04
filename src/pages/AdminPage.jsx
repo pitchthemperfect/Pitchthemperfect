@@ -148,7 +148,7 @@ export default function AdminPage() {
             role: r.role,
             details: r.role === 'pitcher' 
               ? `Nominated: ${r.their_name || ''} (${r.pitchee_gender || ''}, ${r.relationship || ''}). Instagram: ${r.instagram || ''}. Can attend: ${r.can_attend || ''}. Pitch: ${r.pitch || ''}.${r.links ? ` Links: ${r.links}` : ''}`
-              : `Gender: ${r.gender || ''}, Age: ${r.age_group || ''}${r.looking_for ? `. Looking for: ${r.looking_for}` : ''}`,
+              : `Gender: ${r.gender || ''}, Age: ${r.age_group || ''}${r.looking_for ? `. Looking for: ${r.looking_for}` : ''}. Media: ${r.media_consent ? '✅' : '❌'}. Marketing: ${r.consent ? '✅' : '❌'}`,
             status: r.status,
             attended: r.attended || false,
             date: r.created_at ? new Date(r.created_at).toLocaleString('en-US', {
