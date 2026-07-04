@@ -90,17 +90,6 @@ export default function LandingPage() {
 
   return (
     <div className="landing-page">
-      {/* ─── Event badge strip ─── */}
-      {(eventDate || eventLocation) && (
-        <div className="landing-event-strip">
-          {eventDate && <span><CalendarIcon /> {eventDate}</span>}
-          {eventDate && eventLocation && <span className="strip-divider">·</span>}
-          {eventLocation && <span><MapPinIcon /> {eventLocation}</span>}
-          <span className="strip-divider">·</span>
-          <span className="strip-tickets">Tickets from AED 181</span>
-        </div>
-      )}
-
       <div className="landing-inner">
         {/* ─── Hero ─── */}
         <section className="landing-hero-section">
@@ -122,6 +111,15 @@ export default function LandingPage() {
             to a room full of people who actually showed up to meet someone.
             No algorithms. No swiping. Just real human chemistry.
           </p>
+
+          {/* Event info moved here — above CTAs */}
+          <div className="landing-hero-event-info">
+            {eventDate && <span><CalendarIcon /> {eventDate}</span>}
+            {eventDate && eventLocation && <span className="hero-event-divider">·</span>}
+            {eventLocation && <span><MapPinIcon /> {eventLocation}</span>}
+            <span className="hero-event-divider">·</span>
+            <span className="hero-event-tickets">Tickets from AED 181</span>
+          </div>
 
           {/* CTAs */}
           <div className="landing-hero-ctas">
