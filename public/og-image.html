@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OG Image — Pitch Them Perfect</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px; height: 630px;
+    display: flex; align-items: center; justify-content: center;
+    background: #0D0D0D;
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+  }
+  .card {
+    text-align: center;
+    padding: 60px;
+    border: 3px solid #E8386D;
+    border-radius: 24px;
+    background: linear-gradient(145deg, #111 0%, #0A0A0A 100%);
+    max-width: 1000px;
+    width: 100%;
+    position: relative;
+  }
+  .accent-dot {
+    position: absolute;
+    width: 12px; height: 12px;
+    background: #E8386D;
+    border-radius: 50%;
+  }
+  .accent-dot.tl { top: 20px; left: 20px; }
+  .accent-dot.tr { top: 20px; right: 20px; }
+  .accent-dot.bl { bottom: 20px; left: 20px; }
+  .accent-dot.br { bottom: 20px; right: 20px; }
+  .brand {
+    font-size: 18px;
+    color: #E8386D;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    font-weight: 600;
+  }
+  h1 {
+    font-size: 72px;
+    font-weight: 900;
+    color: #FFF;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .tagline {
+    font-size: 28px;
+    color: #AAA;
+    font-style: italic;
+    font-weight: 400;
+    margin-bottom: 40px;
+  }
+  .tagline span {
+    color: #E8386D;
+    font-weight: 700;
+    font-style: normal;
+  }
+  .location {
+    font-size: 18px;
+    color: #888;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+  .heart {
+    display: inline-block;
+    color: #E8386D;
+    font-size: 24px;
+    margin: 0 8px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <span class="accent-dot tl"></span>
+    <span class="accent-dot tr"></span>
+    <span class="accent-dot bl"></span>
+    <span class="accent-dot br"></span>
+    
+    <div class="brand">♥ Live Matchmaking — Dubai</div>
+    <h1>Pitch Them<br>Perfect</h1>
+    <p class="tagline">Think they're the one? <span>Prove it.</span></p>
+    <p class="location">pitchthemperfect.com <span class="heart">♥</span> A night of real pitches & real connections</p>
+  </div>
+</body>
+</html>
