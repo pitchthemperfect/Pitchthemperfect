@@ -720,7 +720,9 @@ export default function AdminPage() {
               className="form-card" 
               style={{ 
                 maxWidth: '650px', 
-                width: '100%', 
+                width: '100%',
+                maxHeight: '85vh',
+                overflowY: 'auto',
                 padding: '32px 24px 24px', 
                 position: 'relative',
                 background: '#FFF',
