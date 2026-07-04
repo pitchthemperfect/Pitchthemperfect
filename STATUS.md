@@ -38,10 +38,14 @@
 - [x] Sold-out → waitlist flow (collects name/email/phone/role, no payment)
 - [x] Admin can promote waitlist → active
 
-### Tracking (GTM)
-- [x] GTM loader via `VITE_GTM_ID` env var — gracefully disabled if not set
-- [x] Events firing: `lead` (CTA + form submit), `complete_registration` (payment click), `purchase` (success page)
-- [x] Tracking utility: `src/lib/tracking.js`
+### Tracking (GTM) — ✅ LIVE
+- [x] GTM Container: `GTM-TD4MPL2N`
+- [x] GTM Loader live di `pitch-them-perfect.vercel.app`
+- [x] 4 Meta Pixel tags ready (Base, Lead, CompleteRegistration, Purchase)
+- [x] 1 GA4 Config tag live (`G-Y15V9EEGJL`)
+- [x] Events: `lead`, `complete_registration`, `purchase`
+- [ ] **Meta Pixel ID placeholder** — nunggu client bikin Meta Business account → ganti `MASUKIN_PIXEL_ID_DISINI` di `Meta Pixel — Base Code`
+- [ ] **Meta Pixel — Purchase** perlu update: `fbq('track', 'Purchase', {value: '0.00', currency: 'AED'});`
 
 ### Backend
 - [x] `supabase/functions/send-confirmation` — welcome email via Brevo
@@ -70,11 +74,10 @@
 - [ ] `BREVO_LIST_ID` — optional, buat contact list
 - [ ] Deploy Edge Functions: `supabase functions deploy send-confirmation send-reminders send-followups`
 
-### GTM / Meta Pixel (nunggu container ID)
-- [ ] Bikin GTM container di `tagmanager.google.com` → dapet `GTM-XXXXXXX`
-- [ ] Set `VITE_GTM_ID` di Vercel env vars → redeploy
-- [ ] Tambah Meta Pixel tag di dalam GTM (Pixel ID dari Meta Business Suite)
-- [ ] Tambah GA4 tag di dalam GTM
+### GTM / Meta Pixel (✅ setup done, nunggu Pixel ID)
+- [x] GTM Container `GTM-TD4MPL2N` — LIVE
+- [ ] Meta Pixel ID dari Meta Business Suite → ganti `MASUKIN_PIXEL_ID_DISINI` di `Meta Pixel — Base Code`
+- [ ] Fix `Meta Pixel — Purchase` tag — tambah `value` + `currency` param
 - [ ] Build retargeting audience: `Lead` fired but `CompleteRegistration` NOT fired
 
 ### Gallery Photos (nunggu client)
