@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../utils/supabaseClient'
 
 const HeartIcon = () => (
@@ -13,6 +13,11 @@ export default function LiveStory() {
   const [message, setMessage] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search)
+    if (p.get('t')) setTable(p.get('t'))
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()

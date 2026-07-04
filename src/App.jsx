@@ -10,6 +10,7 @@ import PitcherPayment from './pages/PitcherPayment'
 import AdminPage from './pages/AdminPage'
 import WaitlistSuccess from './pages/WaitlistSuccess'
 import LiveStory from './pages/LiveStory'
+import QRPage from './pages/QRPage'
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/live" element={<LiveStory />} />
+        <Route path="/qr" element={<QRPage />} />
         <Route path="/registration" element={<RegisterStep1 />} />
         <Route path="/register" element={<Navigate to="/registration" replace />} />
         <Route path="/register/watcher" element={<WatcherStep2 />} />
