@@ -78,6 +78,7 @@ export default function AdminPage() {
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [eventFilter, setEventFilter] = useState('active') // 'active' | 'all'
   const [refreshing, setRefreshing] = useState(false)
   const [storyCards, setStoryCards] = useState([])
   const [showStoryCards, setShowStoryCards] = useState(false)
@@ -132,7 +133,7 @@ export default function AdminPage() {
         const activeId = active?.[0]?.id
 
         let query = supabase.from('registrations').select('*').order('id', { ascending: false })
-        if (activeId) query = query.eq('event_id', activeId)
+        if (eventFilter === 'active' && activeId) query = query.eq('event_id', activeId)
         const { data: dbData, error } = await query
 
         if (error) throw error
@@ -1047,6 +1048,26 @@ export default function AdminPage() {
                   boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04)'
                 }}
               />
+            </div>
+
+            {/* Event Filter */}
+            <div style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <label style={{ fontSize: 13, fontWeight: 700, color: '#111' }}>Event</label>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {[
+                  { value: 'active', label: 'Current' },
+                  { value: 'all', label: 'All Events' },
+                ].map(opt => (
+                  <button key={opt.value} onClick={() => setEventFilter(opt.value)}
+                    style={{
+                      padding: '10px 16px', borderRadius: 999, fontSize: 12.5, fontWeight: 600,
+                      cursor: 'pointer', border: '1.5px solid transparent',
+                      background: eventFilter === opt.value ? '#E8386D' : '#EAECEF',
+                      color: eventFilter === opt.value ? '#FFF' : '#333',
+                      transition: 'all 0.15s'
+                    }}>{opt.label}</button>
+                ))}
+              </div>
             </div>
 
             {/* Role Filter */}
