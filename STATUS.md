@@ -108,7 +108,7 @@ ALTER TABLE registrations ADD COLUMN IF NOT EXISTS pitchee_gender text DEFAULT '
 ALTER TABLE registrations ADD COLUMN IF NOT EXISTS attended boolean DEFAULT false;
 ```
 
-**Tidak ada lagi SQL yang perlu dijalankan.**
+**Tidak ada lagi yang bisa dikerjakan tanpa external keys. Project ~90% complete.**
 
 ---
 
