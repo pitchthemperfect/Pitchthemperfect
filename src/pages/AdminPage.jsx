@@ -93,6 +93,7 @@ export default function AdminPage() {
   const [pricingSaveMessage, setPricingSaveMessage] = useState('')
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [eventDateInput, setEventDateInput] = useState('')
+  const [eventTimeInput, setEventTimeInput] = useState('')
   const [eventLocationInput, setEventLocationInput] = useState('')
   const [gallery1Input, setGallery1Input] = useState('')
   const [gallery2Input, setGallery2Input] = useState('')
@@ -190,9 +191,11 @@ export default function AdminPage() {
           if (pitcherUrlSetting) setPitcherUrlInput(pitcherUrlSetting.value)
 
           const dateSetting = settingsData.find(s => s.key === 'event_date')
+          const timeSetting = settingsData.find(s => s.key === 'event_time')
           const locSetting = settingsData.find(s => s.key === 'event_location')
-          if (dateSetting) setEventDateInput(dateSetting.value)
-          if (locSetting) setEventLocationInput(locSetting.value)
+          setEventDateInput(dateSetting?.value || '')
+          setEventTimeInput(timeSetting?.value || '')
+          setEventLocationInput(locSetting?.value || '')
 
           const g1 = settingsData.find(s => s.key === 'gallery_photo_1')
           const g2 = settingsData.find(s => s.key === 'gallery_photo_2')
@@ -262,6 +265,11 @@ export default function AdminPage() {
       const { error: dateError } = await supabase
         .from('settings')
         .upsert({ key: 'event_date', value: eventDateInput }, { onConflict: 'key' })
+
+      // Update event time
+      const { error: timeError } = await supabase
+        .from('settings')
+        .upsert({ key: 'event_time', value: eventTimeInput }, { onConflict: 'key' })
 
       // Update event location
       const { error: locError } = await supabase
@@ -856,7 +864,27 @@ export default function AdminPage() {
                     </div>
 
                     <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <label style={{ fontSize: 12.5, fontWeight: 700, color: '#444' }}>Event Location</label>
+                      <label style={{ fontSize: 12.5, fontWeight: 700, color: '#444' }}>Time</label>
+                      <input 
+                        type="text" 
+                        value={eventTimeInput} 
+                        onChange={e => setEventTimeInput(e.target.value)}
+                        placeholder="e.g. 7:00 PM"
+                        style={{ 
+                          width: '100%',
+                          padding: '10px 12px', 
+                          border: '1.5px solid #EBEBEB', 
+                          borderRadius: 8, 
+                          fontSize: 13.5, 
+                          fontFamily: 'inherit',
+                          outline: 'none',
+                          boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.03)'
+                        }}
+                      />
+                    </div>
+
+                    <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <label style={{ fontSize: 12.5, fontWeight: 700, color: '#444' }}>Venue</label>
                       <input 
                         type="text" 
                         value={eventLocationInput} 
