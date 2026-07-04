@@ -1206,40 +1206,55 @@ export default function AdminPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
                   <h2 style={{ fontSize: 16, fontWeight: 800, color: '#111', margin: 0 }}>📝 Live Story Cards</h2>
-                  <p style={{ fontSize: 12, color: '#999', margin: '4px 0 0' }}>QR submissions from guest tables</p>
+                  <p style={{ fontSize: 12, color: '#999', margin: '4px 0 0' }}>{storyCards.length} stories from guest tables</p>
                 </div>
-                <button onClick={() => setShowStoryCards(false)}
+                <button onClick={() => { setShowStoryCards(false); clearInterval(window.__storyInterval) }}
                   style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#888' }}>✕</button>
               </div>
-              <div style={{ overflowY: 'auto', flex: 1 }}>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                <button onClick={fetchStoryCards}
+                  style={{
+                    padding: '8px 16px', borderRadius: 8, border: '1.5px solid #FCD4E0',
+                    background: '#FFF5F8', color: '#E8386D', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                    fontFamily: 'inherit'
+                  }}>🔄 Refresh</button>
+                <button onClick={() => {
+                  if (window.__storyInterval) { clearInterval(window.__storyInterval); window.__storyInterval = null }
+                  else { fetchStoryCards(); window.__storyInterval = setInterval(fetchStoryCards, 5000) }
+                }}
+                  style={{
+                    padding: '8px 16px', borderRadius: 8, border: '1.5px solid #FCD4E0',
+                    background: '#FFF', color: '#E8386D', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                    fontFamily: 'inherit'
+                  }}
+                  id="auto-refresh-btn">⏱ Auto-refresh</button>
+              </div>
+              <div style={{ overflowY: 'auto', flex: 1, maxHeight: '60vh' }}>
                 {storyCards.length === 0 ? (
                   <p style={{ color: '#999', fontSize: 13, textAlign: 'center', padding: 40 }}>No stories yet. Share the /live QR code with guests.</p>
                 ) : (
-                  storyCards.map(card => (
+                  <div style={{ display: 'flex', flexDirection: 'column-reverse' }}>
+                    {storyCards.map((card, i) => (
                     <div key={card.id} style={{
-                      padding: '16px 0', borderBottom: '1px solid #F5F5F5',
-                      display: 'flex', flexDirection: 'column', gap: 6
+                      padding: '16px', marginBottom: 8, borderRadius: 12,
+                      background: i % 2 === 0 ? '#FFF5F8' : '#FFF',
+                      border: '1px solid #FEF0F4',
                     }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                         <span style={{ fontWeight: 700, fontSize: 13, color: '#111' }}>
                           {card.name}
-                          {card.table_number && <span style={{ fontWeight: 400, color: '#CCC', marginLeft: 8 }}>Table {card.table_number}</span>}
+                          {card.table_number && <span style={{ fontWeight: 400, color: '#CCC', marginLeft: 6, fontSize: 11 }}>· Table {card.table_number}</span>}
                         </span>
-                        <span style={{ fontSize: 10.5, color: '#BBB' }}>
+                        <span style={{ fontSize: 10, color: '#CCC' }}>
                           {new Date(card.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
-                      <p style={{ fontSize: 13.5, color: '#555', lineHeight: 1.55 }}>{card.message}</p>
+                      <p style={{ fontSize: 14, color: '#444', lineHeight: 1.6 }}>{card.message}</p>
                     </div>
-                  ))
+                  ))}
+                  </div>
                 )}
               </div>
-              <button onClick={fetchStoryCards}
-                style={{
-                  marginTop: 16, padding: '10px', borderRadius: 10, border: '1.5px solid #FCD4E0',
-                  background: '#FFF5F8', color: '#E8386D', fontSize: 13, fontWeight: 700, cursor: 'pointer',
-                  fontFamily: 'inherit'
-                }}>🔄 Refresh Stories</button>
             </div>
           </div>
         )}
