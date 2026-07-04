@@ -704,7 +704,7 @@ img { max-width: 100%; display: block; }
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 8px;
+  margin-top: 24px;
 }
 
 .landing-cta-primary {
