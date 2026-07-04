@@ -91,7 +91,7 @@ export default function PitcherPayment() {
         if (SUPABASE_URL) {
           const res = await fetch(`${SUPABASE_URL}/functions/v1/create-payment`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}` },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ amount: ticketPrice, role: 'pitcher', registration_id: inserted?.id }),
           })
           const ziina = await res.json()
