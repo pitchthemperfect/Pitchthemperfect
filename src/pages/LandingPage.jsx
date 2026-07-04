@@ -112,17 +112,12 @@ export default function LandingPage() {
           {/* CTAs */}
           <div className="landing-hero-ctas">
             <button className="landing-cta-primary" onClick={() => goToRegister('pitcher')}>
-              <MicIcon />
-              Bring Someone to Pitch
-            </button>
-            <button className="landing-cta-secondary-btn" onClick={() => goToRegister('watcher')}>
-              <EyeIcon />
-              Come Watch
+              Reserve Your Spot
             </button>
           </div>
 
           <p className="landing-hero-note">
-            Pitcher submissions are reviewed. Watcher tickets are first-come, first-served.
+            Choose to pitch a friend or come watch — next step.
           </p>
         </section>
 
