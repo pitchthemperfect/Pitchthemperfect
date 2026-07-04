@@ -79,6 +79,8 @@ export default function AdminPage() {
   const [roleFilter, setRoleFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [refreshing, setRefreshing] = useState(false)
+  const [storyCards, setStoryCards] = useState([])
+  const [showStoryCards, setShowStoryCards] = useState(false)
   const fetchersRef = useRef({})
 
   // Pricing settings states
@@ -417,6 +419,16 @@ export default function AdminPage() {
     setData(prev => prev.filter(r => r.id !== id))
   }
 
+  const fetchStoryCards = async () => {
+    const { data } = await supabase
+      .from('story_cards')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(100)
+    if (data) setStoryCards(data)
+    setShowStoryCards(true)
+  }
+
   // Filtered registrations list
   const filteredData = useMemo(() => {
     return data.filter(item => {
@@ -577,6 +589,13 @@ export default function AdminPage() {
               style={{ fontSize: 13, height: 38, padding: '0 16px', marginTop: 0 }}
             >
               ⚙️ Settings
+            </button>
+            <button 
+              className="btn-submit-another" 
+              onClick={fetchStoryCards}
+              style={{ fontSize: 13, height: 38, padding: '0 16px', marginTop: 0, borderColor: '#E8386D', color: '#E8386D' }}
+            >
+              📝 Story Cards
             </button>
             <button 
               onClick={handleLogout}
@@ -1169,6 +1188,61 @@ export default function AdminPage() {
             </table>
           </div>
         </div>
+
+        {/* Story Cards Modal */}
+        {showStoryCards && (
+          <div style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 9999, padding: 20
+          }} onClick={() => setShowStoryCards(false)}>
+            <div style={{
+              maxWidth: '550px', width: '100%', maxHeight: '80vh',
+              background: '#FFF', borderRadius: 16, padding: '28px 24px',
+              border: '1.5px solid #FCD4E0', overflow: 'hidden',
+              display: 'flex', flexDirection: 'column'
+            }} onClick={e => e.stopPropagation()}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <div>
+                  <h2 style={{ fontSize: 16, fontWeight: 800, color: '#111', margin: 0 }}>📝 Live Story Cards</h2>
+                  <p style={{ fontSize: 12, color: '#999', margin: '4px 0 0' }}>QR submissions from guest tables</p>
+                </div>
+                <button onClick={() => setShowStoryCards(false)}
+                  style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#888' }}>✕</button>
+              </div>
+              <div style={{ overflowY: 'auto', flex: 1 }}>
+                {storyCards.length === 0 ? (
+                  <p style={{ color: '#999', fontSize: 13, textAlign: 'center', padding: 40 }}>No stories yet. Share the /live QR code with guests.</p>
+                ) : (
+                  storyCards.map(card => (
+                    <div key={card.id} style={{
+                      padding: '16px 0', borderBottom: '1px solid #F5F5F5',
+                      display: 'flex', flexDirection: 'column', gap: 6
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 700, fontSize: 13, color: '#111' }}>
+                          {card.name}
+                          {card.table_number && <span style={{ fontWeight: 400, color: '#CCC', marginLeft: 8 }}>Table {card.table_number}</span>}
+                        </span>
+                        <span style={{ fontSize: 10.5, color: '#BBB' }}>
+                          {new Date(card.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      <p style={{ fontSize: 13.5, color: '#555', lineHeight: 1.55 }}>{card.message}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+              <button onClick={fetchStoryCards}
+                style={{
+                  marginTop: 16, padding: '10px', borderRadius: 10, border: '1.5px solid #FCD4E0',
+                  background: '#FFF5F8', color: '#E8386D', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                  fontFamily: 'inherit'
+                }}>🔄 Refresh Stories</button>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

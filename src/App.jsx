@@ -9,12 +9,14 @@ import WatcherSuccess from './pages/WatcherSuccess'
 import PitcherPayment from './pages/PitcherPayment'
 import AdminPage from './pages/AdminPage'
 import WaitlistSuccess from './pages/WaitlistSuccess'
+import LiveStory from './pages/LiveStory'
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/live" element={<LiveStory />} />
         <Route path="/registration" element={<RegisterStep1 />} />
         <Route path="/register" element={<Navigate to="/registration" replace />} />
         <Route path="/register/watcher" element={<WatcherStep2 />} />
