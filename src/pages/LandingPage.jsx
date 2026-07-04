@@ -116,11 +116,7 @@ export default function LandingPage() {
 
           {/* Event info moved here — above CTAs */}
           <div className="landing-hero-event-info">
-            {eventDate && <span><CalendarIcon /> {eventDate}</span>}
-            {eventTime && <><span className="hero-event-divider">·</span><span>🕐 {eventTime}</span></>}
-            {eventLocation && <><span className="hero-event-divider">·</span><span><MapPinIcon /> {eventLocation}</span></>}
-            <span className="hero-event-divider">·</span>
-            <span className="hero-event-tickets">Tickets from AED 181</span>
+            <span>{[eventDate, eventTime, eventLocation].filter(Boolean).join(' · ')}{eventDate || eventTime || eventLocation ? ' · ' : ''}<span className="hero-event-tickets">Tickets from AED 181</span></span>
           </div>
 
           {/* CTAs */}
