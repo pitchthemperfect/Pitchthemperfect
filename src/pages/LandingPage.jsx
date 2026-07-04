@@ -116,7 +116,7 @@ export default function LandingPage() {
 
           {/* Event info moved here — above CTAs */}
           <div className="landing-hero-event-info">
-            <span>{[eventDate, eventTime, eventLocation].filter(Boolean).join(' · ')}{eventDate || eventTime || eventLocation ? ' · ' : ''}<span className="hero-event-tickets">Tickets from AED 181</span></span>
+            <span>{[eventDate, eventTime, eventLocation].filter(Boolean).join(' · ')}</span>
           </div>
 
           {/* CTAs */}
