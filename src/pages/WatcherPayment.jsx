@@ -75,7 +75,6 @@ export default function WatcherPayment() {
         const { error, data: inserted } = await supabase.from('registrations').insert({
           name: step1.name, whatsapp: step1.phone || '', email: step1.email,
           role: 'watcher', gender: step2.gender || '', age_group: step2.age || '',
-          looking_for: step2.looking_for || '', media_consent: step2.media_consent || false,
           status: 'pending', amount: `AED ${ticketPrice}`, event_id: eventId,
         }).select('id').single()
 
