@@ -51,7 +51,6 @@ export default function WatcherStep2() {
     if (!form.gender)       e.gender  = 'Please select your gender'
     if (!form.age)          e.age     = 'Please select your age category'
     if (!form.media_consent) e.media_consent = 'Please accept to continue'
-    if (!form.consent)      e.consent = 'Please accept to continue'
     return e
   }
 
@@ -134,7 +133,7 @@ export default function WatcherStep2() {
           onChange={v => set('consent', v)}
           error={errors.consent}
         >
-          I'd love to hear about future Pitch Them Perfect events via WhatsApp and email. <span className="req">*</span>
+          I'd love to hear about future Pitch Them Perfect events via WhatsApp and email.
         </ConsentCheckbox>
 
         <div className="submit-wrapper">
