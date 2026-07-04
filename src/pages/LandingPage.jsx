@@ -39,20 +39,6 @@ const SparkleIcon = () => (
   </svg>
 )
 
-const PEOPLE = [
-  { icon: '🎤', title: 'Nominate', desc: 'Friends take the mic to pitch their single friend — real stories, real chemistry.' },
-  { icon: '👁️', title: 'Watch & Vote', desc: 'The crowd watches live pitches and votes on who they\'d match with.' },
-  { icon: '💌', title: 'Connect', desc: 'After the show, matches are revealed. No apps. No swiping. Just real people.' },
-]
-
-const FAQ = [
-  { q: 'What is Pitch Them Perfect?', a: 'A live matchmaking night where friends go on stage to pitch their single friends to a room of curated singles.' },
-  { q: 'Who can pitch?', a: 'Anyone with a single friend they genuinely believe in. Our team reviews every nomination and selects the best pitches.' },
-  { q: 'Can I just come watch?', a: 'Absolutely. Buy a watcher ticket, show up, enjoy the show, and meet people — no pressure to go on stage.' },
-  { q: 'Is there a dress code?', a: 'Smart casual. Come looking your best — the room will be full of eligible people.' },
-  { q: 'How are matches made?', a: 'After every pitch, the audience votes on who they\'d like to meet. Matches are revealed during the social hour.' },
-]
-
 export default function LandingPage() {
   const navigate = useNavigate()
   const [eventDate, setEventDate] = useState('')
@@ -140,23 +126,6 @@ export default function LandingPage() {
           </p>
         </section>
 
-        {/* ─── How it works ─── */}
-        <section className="landing-how-section">
-          <p className="landing-section-eyebrow">How It Works</p>
-          <h2 className="landing-section-title">Three steps to matchmaking magic</h2>
-
-          <div className="landing-how-cards">
-            {PEOPLE.map((step, i) => (
-              <div key={step.title} className="landing-how-card">
-                <div className="landing-how-step">{String(i + 1).padStart(2, '0')}</div>
-                <div className="landing-how-icon">{step.icon}</div>
-                <h3 className="landing-how-title">{step.title}</h3>
-                <p className="landing-how-desc">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
         {/* ─── Gallery / vibe ─── */}
         <section className="landing-gallery-section">
           <p className="landing-section-eyebrow">The Vibe</p>
@@ -211,59 +180,6 @@ export default function LandingPage() {
                 )}
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* ─── Stats / social proof ─── */}
-        <section className="landing-stats-section">
-          <div className="landing-stat">
-            <span className="landing-stat-num">80+</span>
-            <span className="landing-stat-label">Guests per show</span>
-          </div>
-          <div className="landing-stat-divider" />
-          <div className="landing-stat">
-            <span className="landing-stat-num">10</span>
-            <span className="landing-stat-label">Live pitches</span>
-          </div>
-          <div className="landing-stat-divider" />
-          <div className="landing-stat">
-            <span className="landing-stat-num">60%</span>
-            <span className="landing-stat-label">Match rate</span>
-          </div>
-        </section>
-
-        {/* ─── CTA repeat ─── */}
-        <section className="landing-cta-section">
-          <div className="landing-cta-card">
-            <SparkleIcon />
-            <h2 className="landing-cta-card-title">Ready to join the room?</h2>
-            <p className="landing-cta-card-desc">
-              Whether you're pitching a friend or just here for the show — 
-              this is the most fun you'll have on a night out in Dubai.
-            </p>
-            <div className="landing-cta-card-buttons">
-              <button className="landing-cta-primary" onClick={() => goToRegister('pitcher')}>
-                <MicIcon /> Pitch a Friend
-              </button>
-              <button className="landing-cta-secondary-btn" onClick={() => goToRegister('watcher')}>
-                <EyeIcon /> Get Watcher Ticket
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* ─── FAQ ─── */}
-        <section className="landing-faq-section">
-          <p className="landing-section-eyebrow">FAQ</p>
-          <h2 className="landing-section-title">You might be wondering</h2>
-
-          <div className="landing-faq-list">
-            {FAQ.map((item, i) => (
-              <details key={i} className="landing-faq-item">
-                <summary className="landing-faq-q">{item.q}</summary>
-                <p className="landing-faq-a">{item.a}</p>
-              </details>
-            ))}
           </div>
         </section>
 
