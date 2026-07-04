@@ -148,7 +148,7 @@ export default function AdminPage() {
             role: r.role,
             details: r.role === 'pitcher' 
               ? `Nominated: ${r.their_name || ''} (${r.pitchee_gender || ''}, ${r.relationship || ''}). Instagram: ${r.instagram || ''}. Can attend: ${r.can_attend || ''}. Pitch: ${r.pitch || ''}.${r.links ? ` Links: ${r.links}` : ''}`
-              : `Gender: ${r.gender || ''}, Age: ${r.age_group || ''}`,
+              : `Gender: ${r.gender || ''}, Age: ${r.age_group || ''}${r.looking_for ? `. Looking for: ${r.looking_for}` : ''}`,
             status: r.status,
             attended: r.attended || false,
             date: r.created_at ? new Date(r.created_at).toLocaleString('en-US', {
@@ -433,6 +433,25 @@ export default function AdminPage() {
     const { error } = await supabase.from('registrations').delete().eq('id', id)
     if (error) { console.error('Delete error:', error); return }
     setData(prev => prev.filter(r => r.id !== id))
+  }
+
+  const handleConfirmPayment = async (row) => {
+    if (!window.confirm(`Confirm payment for ${row.name}? This will send the confirmation email.`)) return
+    const newStatus = row.role === 'pitcher' ? 'pitch' : 'paid'
+    const { error } = await supabase
+      .from('registrations')
+      .update({ status: newStatus })
+      .eq('id', row.id)
+    if (error) { console.error('Confirm error:', error); return }
+    setData(prev => prev.map(r => r.id === row.id ? { ...r, status: newStatus } : r))
+    // Trigger confirmation email
+    try {
+      await fetch('https://tnohztvpuflwkltkbphg.supabase.co/functions/v1/send-confirmation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ registration_id: `${row.id}` }),
+      })
+    } catch (_) {}
   }
 
   const handleNewEvent = async () => {
@@ -1255,6 +1274,15 @@ export default function AdminPage() {
                         </label>
                       </td>
                       <td style={{ padding: '20px 20px' }}>
+                        {/* Actions: confirm payment for pending */}
+                        {row.status === 'pending' && (
+                          <button onClick={() => handleConfirmPayment(row)}
+                            style={{
+                              padding: '5px 12px', borderRadius: 6, border: '1.5px solid #E8386D',
+                              background: '#FFF', color: '#E8386D', fontSize: 12, fontWeight: 700,
+                              cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', marginRight: 6
+                            }}>💳 Confirm</button>
+                        )}
                         {/* Actions: approve/decline for pitchers */}
                         {row.role === 'pitcher' && (row.status === 'pitch' || row.status === 'waitlist') ? (
                           <div style={{ display: 'flex', gap: 6 }}>

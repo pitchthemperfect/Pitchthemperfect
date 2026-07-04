@@ -22,7 +22,7 @@ const AGE_OPTIONS = [
 
 function getInitial() {
   try { const s = sessionStorage.getItem('ptp_watcher2'); if (s) return JSON.parse(s) } catch (_) {}
-  return { gender: '', age: '', consent: false }
+  return { gender: '', age: '', looking_for: '', consent: false }
 }
 
 export default function WatcherStep2() {
@@ -98,6 +98,23 @@ export default function WatcherStep2() {
             onChange={v => set('age', v)}
             required
             error={errors.age}
+          />
+        </FormCard>
+
+        <FormCard>
+          <label style={{ fontSize: 12, fontWeight: 700, color: '#111', display: 'block', marginBottom: 8 }}>
+            Who would you love to meet? <span style={{ fontWeight: 400, color: '#888' }}>(optional)</span>
+          </label>
+          <input
+            type="text"
+            value={form.looking_for}
+            onChange={e => set('looking_for', e.target.value)}
+            placeholder="e.g. Someone who loves hiking and bad puns..."
+            style={{
+              width: '100%', padding: '14px 16px', border: '1.5px solid #EBEBEB',
+              borderRadius: 12, fontSize: 14, fontFamily: 'inherit', outline: 'none',
+              background: '#FAFAFA', boxSizing: 'border-box'
+            }}
           />
         </FormCard>
 
