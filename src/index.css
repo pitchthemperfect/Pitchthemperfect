@@ -641,6 +641,7 @@ img { max-width: 100%; display: block; }
   gap: 5px;
 }
 .hero-event-divider { color: #CCC; }
+.hero-event-date { color: #E8386D; font-weight: 700; }
 .hero-event-tickets { color: #E8386D; font-weight: 700; }
 
 .landing-inner {

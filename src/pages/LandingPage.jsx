@@ -116,7 +116,11 @@ export default function LandingPage() {
 
           {/* Event info moved here — above CTAs */}
           <div className="landing-hero-event-info">
-            <span>{[eventDate, eventTime, eventLocation].filter(Boolean).join(' · ')}</span>
+            <span className="hero-event-date">
+              <CalendarIcon /> {eventDate || 'Date TBA'}
+            </span>
+            {eventTime && <span><span className="hero-event-divider">·</span>🕐 {eventTime}</span>}
+            {eventLocation && <span><span className="hero-event-divider">·</span><MapPinIcon /> {eventLocation}</span>}
           </div>
 
           {/* CTAs */}
