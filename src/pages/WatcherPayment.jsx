@@ -36,76 +36,99 @@ const SparklesOutlineIcon = () => (
 )
 
 const INCLUDED = [
-  { icon: <MicOutlineIcon />, title: 'Live Pitches',       desc: 'Friends roast (and rave) about their single friends — live on stage.' },
-  { icon: <CocktailOutlineIcon />, title: 'Drinks & Vibes',     desc: 'A proper night out with great energy and even better people. Includes 1 complimentary drink voucher, redeemable on the night.' },
-  { icon: <HeartOutlineIcon />, title: 'Real Connections',   desc: 'Meet people who were actually curated and vouched for.' },
+  { icon: <MicOutlineIcon />, title: 'Live Pitches', desc: 'Friends roast (and rave) about their single friends — live on stage.' },
+  { icon: <CocktailOutlineIcon />, title: 'Drinks & Vibes', desc: 'A proper night out with great energy and even better people. Includes 1 complimentary drink voucher, redeemable on the night.' },
+  { icon: <HeartOutlineIcon />, title: 'Real Connections', desc: 'Meet people who were actually curated and vouched for.' },
   { icon: <SparklesOutlineIcon />, title: 'No Apps. No Swiping.', desc: 'Just real humans in a real room doing real romance.' },
 ]
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || ''
 
 export default function WatcherPayment() {
   const navigate = useNavigate()
   const [ticketPrice, setTicketPrice] = useState('181.00')
-  const [paymentUrl, setPaymentUrl] = useState('https://pay.ziina.com/dvlp/rOSH02oXn?source=app')
+  const [embeddedUrl, setEmbeddedUrl] = useState('')
+  const [paymentId, setPaymentId] = useState('')
+  const [paying, setPaying] = useState(false)
+  const [registered, setRegistered] = useState(false)
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const { data: priceData } = await supabase
-          .from('settings')
-          .select('value')
-          .eq('key', 'watcher_price')
-          .single()
-        if (priceData && priceData.value) {
-          setTicketPrice(priceData.value)
-        }
-
-        const { data: urlData } = await supabase
-          .from('settings')
-          .select('value')
-          .eq('key', 'watcher_payment_url')
-          .single()
-        if (urlData && urlData.value) {
-          setPaymentUrl(urlData.value)
-        }
-      } catch (err) {
-        console.error('Error fetching watcher settings from Supabase:', err)
-      }
+        const { data: priceData } = await supabase.from('settings').select('value').eq('key', 'watcher_price').single()
+        if (priceData?.value) setTicketPrice(priceData.value)
+      } catch (_) {}
     }
     fetchSettings()
   }, [])
 
   const handlePayClick = async () => {
+    if (registered) return
+    setPaying(true)
+
     try {
       const step1 = JSON.parse(sessionStorage.getItem('ptp_step1') || '{}')
       const step2 = JSON.parse(sessionStorage.getItem('ptp_watcher2') || '{}')
-      
+
       if (step1.name) {
-        // TODO: After Ziina Edge Function is live, status stays 'pending'
-        // until the webhook confirms payment and updates to 'paid'.
         const eventId = await getActiveEventId()
-        const { error } = await supabase.from('registrations').insert({
-          name: step1.name,
-          whatsapp: step1.phone || '',
-          email: step1.email,
-          role: 'watcher',
-          gender: step2.gender || '',
-          age_group: step2.age || '',
-          status: 'pending',
-          amount: `AED ${ticketPrice}`,
-          event_id: eventId,
-        })
-        if (error) {
-          console.error('Supabase error inserting watcher:', error)
-        }
+        const { error, data: inserted } = await supabase.from('registrations').insert({
+          name: step1.name, whatsapp: step1.phone || '', email: step1.email,
+          role: 'watcher', gender: step2.gender || '', age_group: step2.age || '',
+          status: 'pending', amount: `AED ${ticketPrice}`, event_id: eventId,
+        }).select('id').single()
+
+        if (error) throw error
+        setRegistered(true)
         trackCompleteRegistration({ role: 'watcher' })
+
+        if (SUPABASE_URL) {
+          const res = await fetch(`${SUPABASE_URL}/functions/v1/create-payment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}` },
+            body: JSON.stringify({ amount: ticketPrice, role: 'watcher', registration_id: inserted?.id }),
+          })
+          const ziina = await res.json()
+          if (ziina.embedded_url) {
+            setEmbeddedUrl(ziina.embedded_url)
+            setPaymentId(ziina.id)
+            if (inserted?.id && ziina.id) {
+              supabase.from('registrations').update({ ziina_payment_id: ziina.id }).eq('id', inserted.id).then(() => {})
+            }
+            setPaying(false)
+            return
+          }
+        }
+
+        navigate('/success/watcher')
       }
     } catch (err) {
-      console.error('Error saving watcher registration to Supabase:', err)
+      console.error('Payment error:', err)
+      setPaying(false)
     }
+  }
 
-    setTimeout(() => {
-      navigate('/success/watcher')
-    }, 150)
+  useEffect(() => {
+    if (!embeddedUrl) return
+    const handler = (e) => {
+      if (e.data === 'payment_complete' || e.origin === 'https://pay.ziina.com') {
+        navigate('/success/watcher')
+      }
+    }
+    window.addEventListener('message', handler)
+    return () => window.removeEventListener('message', handler)
+  }, [embeddedUrl, navigate])
+
+  if (embeddedUrl) {
+    return (
+      <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', fontFamily: "'Inter', sans-serif", background: '#FAFAFA' }}>
+        <div style={{ padding: '16px 20px', background: '#fff', borderBottom: '1px solid #F0F0F0', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button onClick={() => { setEmbeddedUrl(''); setRegistered(false) }} style={{ background: 'none', border: 'none', fontSize: 14, color: '#888', cursor: 'pointer', fontFamily: 'inherit' }}>← Back</button>
+          <span style={{ fontSize: 14, fontWeight: 700, color: '#111' }}>Payment — AED {ticketPrice}</span>
+        </div>
+        <iframe src={embeddedUrl} style={{ flex: 1, border: 'none', width: '100%' }} title="Ziina Payment" />
+      </div>
+    )
   }
 
   return (
@@ -135,20 +158,10 @@ export default function WatcherPayment() {
       <div className="price-card">
         <p className="price-eyebrow">Ticket Price</p>
         <p className="price-amount"><span>AED</span>{ticketPrice}</p>
-        <a 
-          id="btn-pay-now" 
-          href={paymentUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-primary" 
-          onClick={handlePayClick}
-          style={{ textDecoration: 'none' }}
-        >
-          Pay Now &nbsp;→
-        </a>
-        <p className="price-secure">
-          🔒 Secure payment via Ziina
-        </p>
+        <button id="btn-pay-now" className="btn-primary" onClick={handlePayClick} disabled={paying}>
+          {paying ? 'Creating payment...' : 'Pay Now \u00A0→'}
+        </button>
+        <p className="price-secure">🔒 Secure payment via Ziina</p>
       </div>
     </PageShell>
   )
