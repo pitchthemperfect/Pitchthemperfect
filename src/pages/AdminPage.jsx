@@ -230,7 +230,7 @@ export default function AdminPage() {
 
     // Store so refresh can call them
     fetchersRef.current = { fetchRegistrations, fetchPrices, fetchEventCaps }
-  }, [isAuthenticated])
+  }, [isAuthenticated, eventFilter])
 
   const handleSavePrices = async (e) => {
     e.preventDefault()
