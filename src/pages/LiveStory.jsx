@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../utils/supabaseClient'
+import { getActiveEventId } from '../lib/event'
 
 const HeartIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="#E8386D">
@@ -23,10 +24,12 @@ export default function LiveStory() {
     e.preventDefault()
     if (!name.trim() || !message.trim()) return
     setSaving(true)
+    const eventId = await getActiveEventId()
     await supabase.from('story_cards').insert({
       name: name.trim(),
       table_number: table.trim() || null,
       message: message.trim(),
+      event_id: eventId,
     })
     setSaving(false)
     setSubmitted(true)

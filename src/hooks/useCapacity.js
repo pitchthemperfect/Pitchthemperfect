@@ -38,12 +38,11 @@ export function useCapacity() {
           watcher: ev.cap_watcher,
         })
 
-        // Count confirmed registrations per category for this event
-        // Pitcher: status 'pitch' or 'confirmed' (nominated / selected)
-        // Watcher: status 'pending' or 'paid' (registered / payment verified)
+        // Count confirmed registrations per category for THIS event only
         const { data: regs, error: regErr } = await supabase
           .from('registrations')
           .select('role, pitchee_gender, status')
+          .eq('event_id', ev.id)
 
         if (regErr) throw regErr
 

@@ -419,6 +419,23 @@ export default function AdminPage() {
     setData(prev => prev.filter(r => r.id !== id))
   }
 
+  const handleNewEvent = async () => {
+    if (!window.confirm('Start a new event? This will archive the current event and reset all capacity counters. Old data is preserved.')) return
+    // Deactivate current
+    await supabase.from('events').update({ is_active: false }).eq('is_active', true)
+    // Create new with same caps
+    await supabase.from('events').insert({
+      show_date: new Date().toISOString().split('T')[0],
+      cap_pitcher_male: parseInt(capPitcherMaleInput) || 5,
+      cap_pitcher_female: parseInt(capPitcherFemaleInput) || 5,
+      cap_watcher: parseInt(capWatcherInput) || 60,
+      is_active: true,
+    })
+    // Clear event cache so next fetch gets the new one
+    import('../lib/event').then(m => m.clearEventCache())
+    handleRefresh()
+  }
+
   const fetchStoryCards = async () => {
     const { data } = await supabase
       .from('story_cards')
@@ -850,6 +867,26 @@ export default function AdminPage() {
                       />
                     </div>
                   </div>
+                </div>
+
+                <div style={{ borderTop: '1.5px solid #F0F0F0', paddingTop: 4, marginTop: 4 }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#999', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Event Lifecycle</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1, minWidth: 200, display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: '#F8F9FA', borderRadius: 8 }}>
+                      <span style={{ fontSize: 18 }}>📅</span>
+                      <div>
+                        <p style={{ fontSize: 12, fontWeight: 700, color: '#111' }}>{eventDateInput || 'Current Event'}</p>
+                        <p style={{ fontSize: 11, color: '#999' }}>{eventLocationInput || 'Location not set'}</p>
+                      </div>
+                    </div>
+                    <button type="button" onClick={handleNewEvent}
+                      style={{
+                        padding: '10px 18px', borderRadius: 8, border: '2px solid #E8386D',
+                        background: '#FFF', color: '#E8386D', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                        fontFamily: 'inherit', whiteSpace: 'nowrap'
+                      }}>+ New Event</button>
+                  </div>
+                  <p style={{ fontSize: 11, color: '#AAA', marginTop: 6 }}>Starts a fresh event. Current registrations are preserved but won't count toward new capacity.</p>
                 </div>
 
                 <div style={{ borderTop: '1.5px solid #F0F0F0', paddingTop: 4, marginTop: 4 }}>

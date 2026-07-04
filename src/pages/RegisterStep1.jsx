@@ -35,7 +35,7 @@ export default function RegisterStep1() {
   const [showErrorBanner, setShowErrorBanner] = useState(false)
   const [saving, setSaving] = useState(false)
   const timeoutRef = useRef(null)
-  const { remaining, isSoldOut } = useCapacity()
+  const { remaining, isSoldOut, eventId } = useCapacity()
 
   const pitcherFull = isSoldOut.pitcher_male && isSoldOut.pitcher_female
   const watcherFull = isSoldOut.watcher
@@ -88,6 +88,7 @@ export default function RegisterStep1() {
           email: form.email,
           role: form.role,
           status: 'waitlist',
+          event_id: eventId,
         })
       } catch (err) {
         console.error('Waitlist save error:', err)

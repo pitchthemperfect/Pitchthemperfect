@@ -5,6 +5,7 @@ import FormCard from '../components/FormCard'
 import BackButton from '../components/BackButton'
 import { supabase } from '../utils/supabaseClient'
 import { trackCompleteRegistration } from '../lib/tracking'
+import { getActiveEventId } from '../lib/event'
 
 const MicOutlineIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8386D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
@@ -100,6 +101,7 @@ export default function PitcherPayment() {
       if (step1.name) {
         // TODO: After Ziina Edge Function is live, change status to 'pending'
         // and let the webhook update it to 'confirmed' upon payment verification.
+        const eventId = await getActiveEventId()
         const { error } = await supabase.from('registrations').insert({
           name: step1.name,
           whatsapp: step1.phone || '',
@@ -113,7 +115,8 @@ export default function PitcherPayment() {
           pitch: step2.pitch || '',
           status: 'pitch',
           amount: `AED ${ticketPrice}`,
-          links: step2.links || ''
+          links: step2.links || '',
+          event_id: eventId,
         })
         if (error) {
           console.error('Supabase error inserting pitcher:', error)
