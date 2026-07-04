@@ -22,7 +22,7 @@ const AGE_OPTIONS = [
 
 function getInitial() {
   try { const s = sessionStorage.getItem('ptp_watcher2'); if (s) return JSON.parse(s) } catch (_) {}
-  return { gender: '', age: '', looking_for: '', consent: false }
+  return { gender: '', age: '', looking_for: '', consent: false, media_consent: false }
 }
 
 export default function WatcherStep2() {
@@ -48,9 +48,10 @@ export default function WatcherStep2() {
 
   const validate = () => {
     const e = {}
-    if (!form.gender)  e.gender  = 'Please select your gender'
-    if (!form.age)     e.age     = 'Please select your age category'
-    if (!form.consent) e.consent = 'Please accept to continue'
+    if (!form.gender)       e.gender  = 'Please select your gender'
+    if (!form.age)          e.age     = 'Please select your age category'
+    if (!form.media_consent) e.media_consent = 'Please accept to continue'
+    if (!form.consent)      e.consent = 'Please accept to continue'
     return e
   }
 
@@ -119,12 +120,21 @@ export default function WatcherStep2() {
         </FormCard>
 
         <ConsentCheckbox
+          id="watcher-media-consent"
+          checked={form.media_consent}
+          onChange={v => set('media_consent', v)}
+          error={errors.media_consent}
+        >
+          I consent to appearing on stage, being photographed, filmed, or recorded during the event, and being contacted by Pitch Them Perfect. <span className="req">*</span>
+        </ConsentCheckbox>
+
+        <ConsentCheckbox
           id="watcher-consent"
           checked={form.consent}
           onChange={v => set('consent', v)}
           error={errors.consent}
         >
-          I'm happy for Pitch Them Perfect to contact me via WhatsApp and email about this event and future editions. <span className="req">*</span>
+          I'd love to hear about future Pitch Them Perfect events via WhatsApp and email. <span className="req">*</span>
         </ConsentCheckbox>
 
         <div className="submit-wrapper">
