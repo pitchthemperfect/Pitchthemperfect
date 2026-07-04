@@ -123,10 +123,17 @@ export default function AdminPage() {
     const fetchRegistrations = async () => {
       try {
         setLoading(true)
-        const { data: dbData, error } = await supabase
-          .from('registrations')
-          .select('*')
-          .order('id', { ascending: false })
+        // Get active event first to filter
+        const { data: active } = await supabase
+          .from('events')
+          .select('id')
+          .eq('is_active', true)
+          .limit(1)
+        const activeId = active?.[0]?.id
+
+        let query = supabase.from('registrations').select('*').order('id', { ascending: false })
+        if (activeId) query = query.eq('event_id', activeId)
+        const { data: dbData, error } = await query
 
         if (error) throw error
 
@@ -437,11 +444,11 @@ export default function AdminPage() {
   }
 
   const fetchStoryCards = async () => {
-    const { data } = await supabase
-      .from('story_cards')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(100)
+    const { data: active } = await supabase.from('events').select('id').eq('is_active', true).limit(1)
+    const activeId = active?.[0]?.id
+    let query = supabase.from('story_cards').select('*').order('created_at', { ascending: false }).limit(100)
+    if (activeId) query = query.eq('event_id', activeId)
+    const { data } = await query
     if (data) setStoryCards(data)
     setShowStoryCards(true)
   }
