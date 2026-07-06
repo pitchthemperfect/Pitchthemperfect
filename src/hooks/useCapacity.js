@@ -56,7 +56,7 @@ export function useCapacity() {
           for (const r of regs) {
             if (r.role === 'watcher' && (r.status === 'paid' || r.status === 'pending')) {
               counts.watcher++
-            } else if (r.role === 'pitcher' && (r.status === 'pitch' || r.status === 'confirmed')) {
+            } else if (r.role === 'pitcher' && r.status === 'paid') {
               // Capacity is split by pitchee gender
               if (r.pitchee_gender === 'female') {
                 counts.pitcher_female++

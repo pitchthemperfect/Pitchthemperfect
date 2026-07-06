@@ -450,7 +450,7 @@ export default function AdminPage() {
 
   const handleConfirmPayment = async (row) => {
     if (!window.confirm(`Confirm payment for ${row.name}? This will send the confirmation email.`)) return
-    const newStatus = row.role === 'pitcher' ? 'confirmed' : 'paid'
+    const newStatus = 'paid'
     const { error } = await supabase
       .from('registrations')
       .update({ status: newStatus })
@@ -518,13 +518,13 @@ export default function AdminPage() {
       pitchers: pitchers.length,
       pitchersMale: pitchers.filter(r => r.pitchee_gender !== 'female').length,
       pitchersFemale: pitchers.filter(r => r.pitchee_gender === 'female').length,
-      pitchersMaleConfirmed: pitchers.filter(r => r.pitchee_gender !== 'female' && (r.status === 'confirmed' || r.status === 'pitch')).length,
-      pitchersFemaleConfirmed: pitchers.filter(r => r.pitchee_gender === 'female' && (r.status === 'confirmed' || r.status === 'pitch')).length,
+      pitchersMaleConfirmed: pitchers.filter(r => r.pitchee_gender !== 'female' && r.status === 'paid').length,
+      pitchersFemaleConfirmed: pitchers.filter(r => r.pitchee_gender === 'female' && r.status === 'paid').length,
       paidWatchers: watchers.filter(r => r.status === 'paid').length,
       pendingWatchers: watchers.filter(r => r.status === 'pending').length,
-      pitchersConfirmed: pitchers.filter(r => r.status === 'confirmed' || r.status === 'pitch').length,
+      pitchersConfirmed: pitchers.filter(r => r.status === 'paid').length,
       pitchersPending: pitchers.filter(r => r.status === 'pending').length,
-      totalPaid: watchers.filter(r => r.status === 'paid').length + pitchers.filter(r => r.status === 'confirmed' || r.status === 'pitch').length,
+      totalPaid: watchers.filter(r => r.status === 'paid').length + pitchers.filter(r => r.status === 'paid').length,
       waitlist: data.filter(r => r.status === 'waitlist').length,
       watchersTotal: watchers.length,
     }
