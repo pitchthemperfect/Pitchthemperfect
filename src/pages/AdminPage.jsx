@@ -94,6 +94,9 @@ export default function AdminPage() {
   }
   const [pixelStats, setPixelStats] = useState(null)
 
+  // Tabs
+  const [activeTab, setActiveTab] = useState('registrations')
+
   // Pricing settings states
   const [watcherPriceInput, setWatcherPriceInput] = useState('181.00')
   const [pitcherPriceInput, setPitcherPriceInput] = useState('310.00')
@@ -700,6 +703,29 @@ export default function AdminPage() {
           </div>
         </div>
 
+        {/* ─── Tab Bar ─── */}
+        <div style={{ display: 'flex', gap: 4, background: '#FFF', borderRadius: 12, padding: 4, border: '1.5px solid #EAECEF' }}>
+          {[
+            { id: 'registrations', label: '📋 Registrations' },
+            { id: 'analytics',    label: '📊 Analytics' },
+            { id: 'storycards',   label: '⭐ Story Cards' },
+            { id: 'settings',     label: '⚙️ Settings' },
+          ].map(tab => (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              style={{
+                flex: 1, padding: '12px 16px', borderRadius: 9, border: 'none',
+                background: activeTab === tab.id ? '#111' : 'transparent',
+                color: activeTab === tab.id ? '#FFF' : '#888',
+                fontWeight: 700, fontSize: 13.5, cursor: 'pointer',
+                fontFamily: 'inherit', transition: 'all 0.15s'
+              }}>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ─── Tab: Registrations ─── */}
+        {activeTab === 'registrations' && (<>
         {/* Stats Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
           {[
@@ -1348,6 +1374,51 @@ export default function AdminPage() {
             </table>
           </div>
         </div>
+        </>)}
+
+        {/* ─── Tab: Analytics ─── */}
+        {activeTab === 'analytics' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }} onClick={() => fetchPixelStats()}>
+            {/* Stats Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
+              {stats.map((s, i) => (
+                <div key={i} style={{ background: '#FFF', borderRadius: 12, padding: '20px', border: '1.5px solid #EAECEF', textAlign: 'center' }}>
+                  <div style={{ fontSize: 32, fontWeight: 900, color: '#111' }}>{s.value}</div>
+                  <div style={{ fontSize: 12, color: '#999', fontWeight: 600, marginTop: 4 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+            <button onClick={fetchPixelStats} style={{ padding: '16px', borderRadius: 12, border: '1.5px dashed #CCC', background: '#FFF', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, fontWeight: 600, color: '#666' }}>
+              📊 Load Pixel Event Data
+            </button>
+          </div>
+        )}
+
+        {/* ─── Tab: Story Cards ─── */}
+        {activeTab === 'storycards' && (
+          <div style={{ textAlign: 'center', padding: '60px 20px', background: '#FFF', borderRadius: 16, border: '1.5px solid #FCD4E0' }}
+            onClick={() => setShowStoryCards(true)}>
+            <span style={{ fontSize: 48 }}>⭐</span>
+            <h3 style={{ fontSize: 18, fontWeight: 700, marginTop: 12 }}>Live Story Cards</h3>
+            <p style={{ color: '#888', fontSize: 13.5, marginTop: 8 }}>View and manage guest story submissions in real-time during the event.</p>
+            <button style={{ marginTop: 16, padding: '12px 24px', borderRadius: 8, background: '#E8386D', color: '#FFF', border: 'none', fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', fontSize: 14 }}>
+              📝 Open Story Cards
+            </button>
+          </div>
+        )}
+
+        {/* ─── Tab: Settings ─── */}
+        {activeTab === 'settings' && (
+          <div style={{ textAlign: 'center', padding: '60px 20px', background: '#FFF', borderRadius: 16, border: '1.5px solid #EAECEF' }}
+            onClick={() => setIsSettingsOpen(true)}>
+            <span style={{ fontSize: 48 }}>⚙️</span>
+            <h3 style={{ fontSize: 18, fontWeight: 700, marginTop: 12 }}>Event Settings</h3>
+            <p style={{ color: '#888', fontSize: 13.5, marginTop: 8 }}>Configure prices, event details, capacity limits, and gallery photos.</p>
+            <button style={{ marginTop: 16, padding: '12px 24px', borderRadius: 8, background: '#111', color: '#FFF', border: 'none', fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', fontSize: 14 }}>
+              ⚙️ Open Settings
+            </button>
+          </div>
+        )}
 
         {/* Story Cards Modal */}
         {showStoryCards && (
