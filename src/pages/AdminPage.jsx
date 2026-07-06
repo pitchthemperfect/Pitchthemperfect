@@ -97,6 +97,17 @@ export default function AdminPage() {
   // Tabs
   const [activeTab, setActiveTab] = useState('registrations')
 
+  // Email template states
+  const [emailPitcherSubject, setEmailPitcherSubject] = useState('You\'re in the running! — Pitch Them Perfect')
+  const [emailPitcherBody, setEmailPitcherBody] = useState('<h2>Hi {{name}},</h2><p>Your pitch nomination has been received!</p><p>— Team Pitch Them Perfect</p>')
+  const [emailWatcherSubject, setEmailWatcherSubject] = useState('You\'re all set! — Pitch Them Perfect')
+  const [emailWatcherBody, setEmailWatcherBody] = useState('<h2>Hi {{name}},</h2><p>Your spot is secured!</p><p>— Team Pitch Them Perfect</p>')
+  const [emailReminderSubject, setEmailReminderSubject] = useState('See you in 2 days! — Pitch Them Perfect')
+  const [emailReminderBody, setEmailReminderBody] = useState('<h2>Hi {{name}},</h2><p>It\'s almost time!</p><ul><li>📍 Venue details in your confirmation email</li><li>👔 Dress code: Smart casual</li><li>🥂 Complimentary drink voucher</li></ul><p>— Team Pitch Them Perfect</p>')
+  const [emailFollowupSubject, setEmailFollowupSubject] = useState('How was Pitch Them Perfect? 💌')
+  const [emailFollowupBody, setEmailFollowupBody] = useState('<h2>Hi {{name}},</h2><p>Thank you for being part of it!</p><p><a href=\"{{feedback_url}}\">Give Feedback</a></p><p>— Team Pitch Them Perfect</p>')
+  const [emailSaveMsg, setEmailSaveMsg] = useState('')
+
   // Pricing settings states
   const [watcherPriceInput, setWatcherPriceInput] = useState('181.00')
   const [pitcherPriceInput, setPitcherPriceInput] = useState('310.00')
@@ -714,6 +725,7 @@ export default function AdminPage() {
             { id: 'registrations', label: '📋 Registrations' },
             { id: 'analytics',    label: '📊 Analytics' },
             { id: 'storycards',   label: '⭐ Story Cards' },
+            { id: 'email',       label: '📧 Email' },
             { id: 'settings',     label: '⚙️ Settings' },
           ].map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
@@ -1381,6 +1393,57 @@ export default function AdminPage() {
             <p style={{ color: '#888', fontSize: 13.5, marginTop: 8 }}>View and manage guest story submissions in real-time during the event.</p>
             <button style={{ marginTop: 16, padding: '12px 24px', borderRadius: 8, background: '#E8386D', color: '#FFF', border: 'none', fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', fontSize: 14 }}>
               📝 Open Story Cards
+            </button>
+          </div>
+        )}
+
+        {/* ─── Tab: Email ─── */}
+        {activeTab === 'email' && (
+          <div style={{ background: '#FFF', borderRadius: 16, padding: '32px 24px', border: '1.5px solid #EAECEF' }}>
+            <h3 style={{ margin: '0 0 24px', fontSize: 18, fontWeight: 800 }}>📧 Email Templates</h3>
+            <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>Use <code>{'{{name}}'}</code> for recipient name and <code>{'{{feedback_url}}'}</code> for feedback link. Changes take effect on next send.</p>
+
+            {emailSaveMsg && <div style={{ padding: '10px 14px', borderRadius: 8, background: '#E8F5E9', color: '#2E7D32', fontWeight: 700, fontSize: 13, marginBottom: 20 }}>{emailSaveMsg}</div>}
+
+            {/* Templates */}
+            {[
+              { key: 'confirmation_pitcher', label: '🎤 Confirmation — Pitcher', subj: emailPitcherSubject, setSubj: setEmailPitcherSubject, body: emailPitcherBody, setBody: setEmailPitcherBody },
+              { key: 'confirmation_watcher', label: '👁 Confirmation — Watcher', subj: emailWatcherSubject, setSubj: setEmailWatcherSubject, body: emailWatcherBody, setBody: setEmailWatcherBody },
+              { key: 'reminder', label: '🔔 Reminder (H-2)', subj: emailReminderSubject, setSubj: setEmailReminderSubject, body: emailReminderBody, setBody: setEmailReminderBody },
+              { key: 'followup', label: '💌 Follow-up (post-event)', subj: emailFollowupSubject, setSubj: setEmailFollowupSubject, body: emailFollowupBody, setBody: setEmailFollowupBody },
+            ].map(tpl => (
+              <div key={tpl.key} style={{ marginBottom: 28, paddingBottom: 20, borderBottom: '1.5px solid #F0F0F0' }}>
+                <label style={{ fontSize: 13.5, fontWeight: 700, color: '#111', display: 'block', marginBottom: 10 }}>{tpl.label}</label>
+                <input type="text" value={tpl.subj} onChange={e => tpl.setSubj(e.target.value)}
+                  placeholder="Subject line"
+                  style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '1.5px solid #EBEBEB', fontSize: 13.5, fontFamily: 'inherit', marginBottom: 10, boxSizing: 'border-box', outline: 'none' }} />
+                <textarea value={tpl.body} onChange={e => tpl.setBody(e.target.value)}
+                  placeholder="HTML body..."
+                  rows={4}
+                  style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '1.5px solid #EBEBEB', fontSize: 13, fontFamily: 'monospace', resize: 'vertical', boxSizing: 'border-box', outline: 'none' }} />
+              </div>
+            ))}
+
+            <button onClick={async () => {
+              setEmailSaveMsg('Saving...')
+              const items = [
+                { key: 'email_conf_pitcher_subject', value: emailPitcherSubject },
+                { key: 'email_conf_pitcher_body', value: emailPitcherBody },
+                { key: 'email_conf_watcher_subject', value: emailWatcherSubject },
+                { key: 'email_conf_watcher_body', value: emailWatcherBody },
+                { key: 'email_reminder_subject', value: emailReminderSubject },
+                { key: 'email_reminder_body', value: emailReminderBody },
+                { key: 'email_followup_subject', value: emailFollowupSubject },
+                { key: 'email_followup_body', value: emailFollowupBody },
+              ]
+              for (const item of items) {
+                await supabase.from('settings').upsert({ key: item.key, value: item.value }, { onConflict: 'key' })
+              }
+              setEmailSaveMsg('✅ Templates saved!')
+              setTimeout(() => setEmailSaveMsg(''), 2000)
+            }}
+              style={{ padding: '12px 24px', borderRadius: 8, background: '#E8386D', color: '#FFF', border: 'none', fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', fontSize: 14 }}>
+              💾 Save All Templates
             </button>
           </div>
         )}
