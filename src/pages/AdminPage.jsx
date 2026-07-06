@@ -98,14 +98,14 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('registrations')
 
   // Email template states
-  const [emailPitcherSubject, setEmailPitcherSubject] = useState('You\'re in the running! — Pitch Them Perfect')
-  const [emailPitcherBody, setEmailPitcherBody] = useState('<h2>Hi {{name}},</h2><p>Your pitch nomination has been received!</p><p>— Team Pitch Them Perfect</p>')
+  const [emailPitcherSubject, setEmailPitcherSubject] = useState('We received your nomination! — Pitch Them Perfect')
+  const [emailPitcherBody, setEmailPitcherBody] = useState('Hi {{name}},\n\nThank you for submitting a pitch nomination! Our team will review every submission carefully.\n\nIf selected, we\'ll be in touch with next steps and event details.\n\n— Team Pitch Them Perfect')
   const [emailWatcherSubject, setEmailWatcherSubject] = useState('You\'re all set! — Pitch Them Perfect')
-  const [emailWatcherBody, setEmailWatcherBody] = useState('<h2>Hi {{name}},</h2><p>Your spot is secured!</p><p>— Team Pitch Them Perfect</p>')
+  const [emailWatcherBody, setEmailWatcherBody] = useState('Hi {{name}},\n\nYour spot is secured! Get ready for a night of real pitches, real people, and real connections.\n\nEvent details, drink voucher info, and dress code will follow soon.\n\n— Team Pitch Them Perfect')
   const [emailReminderSubject, setEmailReminderSubject] = useState('See you in 2 days! — Pitch Them Perfect')
-  const [emailReminderBody, setEmailReminderBody] = useState('<h2>Hi {{name}},</h2><p>It\'s almost time!</p><ul><li>📍 Venue details in your confirmation email</li><li>👔 Dress code: Smart casual</li><li>🥂 Complimentary drink voucher</li></ul><p>— Team Pitch Them Perfect</p>')
-  const [emailFollowupSubject, setEmailFollowupSubject] = useState('How was Pitch Them Perfect? 💌')
-  const [emailFollowupBody, setEmailFollowupBody] = useState('<h2>Hi {{name}},</h2><p>Thank you for being part of it!</p><p><a href=\"{{feedback_url}}\">Give Feedback</a></p><p>— Team Pitch Them Perfect</p>')
+  const [emailReminderBody, setEmailReminderBody] = useState('Hi {{name}},\n\nIt\'s almost time! Pitch Them Perfect is just 2 days away.\n\nHere\'s what you need to know:\n- Venue details in your confirmation email\n- Dress code: Smart casual\n- Complimentary drink voucher on arrival\n\nWe can\'t wait to see you there!\n\n— Team Pitch Them Perfect')
+  const [emailFollowupSubject, setEmailFollowupSubject] = useState('How was Pitch Them Perfect?')
+  const [emailFollowupBody, setEmailFollowupBody] = useState('Hi {{name}},\n\nThank you for being part of Pitch Them Perfect! We hope you had an amazing night.\n\nWe\'d love to hear your thoughts:\n{{feedback_url}}\n\nAnd if you met someone special... we\'d love to know!\n\n— Team Pitch Them Perfect')
   const [emailSaveMsg, setEmailSaveMsg] = useState('')
 
   // Pricing settings states
@@ -1401,7 +1401,7 @@ export default function AdminPage() {
         {activeTab === 'email' && (
           <div style={{ background: '#FFF', borderRadius: 16, padding: '32px 24px', border: '1.5px solid #EAECEF' }}>
             <h3 style={{ margin: '0 0 24px', fontSize: 18, fontWeight: 800 }}>📧 Email Templates</h3>
-            <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>Use <code>{'{{name}}'}</code> for recipient name and <code>{'{{feedback_url}}'}</code> for feedback link. Changes take effect on next send.</p>
+            <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>Write plain text. Line breaks become paragraphs. Use <code>{'{{name}}'}</code> for recipient name. Changes apply on next send.</p>
 
             {emailSaveMsg && <div style={{ padding: '10px 14px', borderRadius: 8, background: '#E8F5E9', color: '#2E7D32', fontWeight: 700, fontSize: 13, marginBottom: 20 }}>{emailSaveMsg}</div>}
 
@@ -1419,7 +1419,7 @@ export default function AdminPage() {
                   style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '1.5px solid #EBEBEB', fontSize: 13.5, fontFamily: 'inherit', marginBottom: 10, boxSizing: 'border-box', outline: 'none' }} />
                 <textarea value={tpl.body} onChange={e => tpl.setBody(e.target.value)}
                   placeholder="HTML body..."
-                  rows={4}
+                  rows={6}
                   style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '1.5px solid #EBEBEB', fontSize: 13, fontFamily: 'monospace', resize: 'vertical', boxSizing: 'border-box', outline: 'none' }} />
               </div>
             ))}
