@@ -55,3 +55,8 @@ export function trackCompleteRegistration(detail = {}) {
 export function trackPurchase(detail = {}) {
   track('purchase', { registration_type: detail.role || 'unknown', ...detail })
 }
+
+/** User reaches payment page (before paying) */
+export function trackBeginCheckout(detail = {}) {
+  track('begin_checkout', { registration_type: detail.role || 'unknown', ...detail })
+}

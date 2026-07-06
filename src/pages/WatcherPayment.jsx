@@ -4,7 +4,7 @@ import PageShell from '../components/PageShell'
 import FormCard from '../components/FormCard'
 import BackButton from '../components/BackButton'
 import { supabase } from '../utils/supabaseClient'
-import { trackCompleteRegistration } from '../lib/tracking'
+import { trackCompleteRegistration, trackBeginCheckout } from '../lib/tracking'
 import { getActiveEventId } from '../lib/event'
 
 const MicOutlineIcon = () => (
@@ -53,6 +53,7 @@ export default function WatcherPayment() {
   const [registered, setRegistered] = useState(false)
 
   useEffect(() => {
+    trackBeginCheckout({ role: 'watcher' })
     const fetchSettings = async () => {
       try {
         const { data: priceData } = await supabase.from('settings').select('value').eq('key', 'watcher_price').single()
