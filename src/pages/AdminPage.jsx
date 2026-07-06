@@ -1381,10 +1381,22 @@ export default function AdminPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }} onClick={() => fetchPixelStats()}>
             {/* Stats Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
-              {stats.map((s, i) => (
-                <div key={i} style={{ background: '#FFF', borderRadius: 12, padding: '20px', border: '1.5px solid #EAECEF', textAlign: 'center' }}>
-                  <div style={{ fontSize: 32, fontWeight: 900, color: '#111' }}>{s.value}</div>
+              {[
+                { label: 'Total Signups', val: stats.total, icon: '👥' },
+                { label: 'Pitchers (M)', val: stats.pitchersMale, icon: '🎤♂️', sub: `cap: ${capPitcherMaleInput}` },
+                { label: 'Pitchers (F)', val: stats.pitchersFemale, icon: '🎤♀️', sub: `cap: ${capPitcherFemaleInput}` },
+                { label: 'Watchers', val: stats.watchersTotal, icon: '👁', sub: `cap: ${capWatcherInput}` },
+                { label: 'Paid', val: stats.paidWatchers, icon: '✅' },
+                { label: 'Pending', val: stats.pendingWatchers, icon: '⏳' },
+                { label: 'Waitlist', val: stats.waitlist, icon: '📋' },
+                { label: 'Pitcher M left', val: Math.max(0, parseInt(capPitcherMaleInput) - stats.pitchersMale), icon: '🎤♂️', sub: `of ${capPitcherMaleInput}` },
+                { label: 'Pitcher F left', val: Math.max(0, parseInt(capPitcherFemaleInput) - stats.pitchersFemale), icon: '🎤♀️', sub: `of ${capPitcherFemaleInput}` },
+                { label: 'Watcher left', val: Math.max(0, parseInt(capWatcherInput) - stats.watchersTotal), icon: '👁', sub: `of ${capWatcherInput}` },
+              ].map(s => (
+                <div key={s.label} style={{ background: '#FFF', borderRadius: 12, padding: '20px', border: '1.5px solid #EAECEF', textAlign: 'center' }}>
+                  <div style={{ fontSize: 32, fontWeight: 900, color: '#111' }}>{s.val}</div>
                   <div style={{ fontSize: 12, color: '#999', fontWeight: 600, marginTop: 4 }}>{s.label}</div>
+                  {s.sub && <div style={{ fontSize: 10, color: '#BBB', marginTop: 2 }}>{s.sub}</div>}
                 </div>
               ))}
             </div>
