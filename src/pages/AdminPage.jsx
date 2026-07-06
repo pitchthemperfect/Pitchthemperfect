@@ -1200,10 +1200,9 @@ export default function AdminPage() {
               <div style={{ display: 'flex', gap: 6 }}>
                 {[
                   { value: 'all', label: 'All' },
-                  { value: 'paid', label: 'Paid' },
-                  { value: 'pitch', label: 'Pitch' },
-                  { value: 'pending', label: 'Pending' },
-                  { value: 'waitlist', label: 'Waitlist' }
+                  { value: 'paid', label: '💳 Paid' },
+                  { value: 'pending', label: '⏳ Unpaid' },
+                  { value: 'waitlist', label: '📋 Waitlist' },
                 ].map(opt => (
                   <button
                     key={opt.value}
