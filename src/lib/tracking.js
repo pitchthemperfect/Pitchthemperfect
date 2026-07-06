@@ -4,6 +4,8 @@
  * Loads GTM programmatically via main.jsx init.
  */
 
+import { supabase } from '../utils/supabaseClient'
+
 const GTM_ID = import.meta.env.VITE_GTM_ID || ''
 
 /** Call once from main.jsx to bootstrap GTM */
@@ -26,6 +28,17 @@ export function initGTM() {
 export function track(event, params = {}) {
   window.dataLayer = window.dataLayer || []
   window.dataLayer.push({ event, ...params })
+  // Also log to Supabase for admin dashboard
+  logPixelEvent(event)
+}
+
+/** Log pixel event to Supabase for admin reporting */
+async function logPixelEvent(eventName) {
+  try {
+    await supabase.from('pixel_events').insert({ event_name: eventName })
+  } catch (_) {
+    // silent — don't break UX if logging fails
+  }
 }
 
 /** User clicks a CTA or begins registration */

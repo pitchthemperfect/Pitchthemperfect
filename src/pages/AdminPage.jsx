@@ -84,6 +84,16 @@ export default function AdminPage() {
   const [showStoryCards, setShowStoryCards] = useState(false)
   const fetchersRef = useRef({})
 
+  // Pixel stats
+  const fetchPixelStats = async () => {
+    const { data, error } = await supabase.from('pixel_events').select('event_name, created_at').order('created_at', { ascending: false }).limit(200)
+    if (error) { alert('Failed to load pixel events'); return }
+    const counts = { total: data.length }
+    for (const e of data) { counts[e.event_name] = (counts[e.event_name] || 0) + 1 }
+    setPixelStats({ counts, events: data.slice(0, 20) })
+  }
+  const [pixelStats, setPixelStats] = useState(null)
+
   // Pricing settings states
   const [watcherPriceInput, setWatcherPriceInput] = useState('181.00')
   const [pitcherPriceInput, setPitcherPriceInput] = useState('310.00')
@@ -648,6 +658,12 @@ export default function AdminPage() {
               style={{ fontSize: 13, height: 38, padding: '0 16px', marginTop: 0, borderColor: '#E8386D', color: '#E8386D' }}
             >
               📝 Story Cards
+            </button>
+            <button 
+              onClick={fetchPixelStats}
+              style={{ fontSize: 13, height: 38, padding: '0 16px', marginTop: 0, borderColor: '#888', color: '#888' }}
+            >
+              📊 Pixel Log
             </button>
             <button 
               className="btn-submit-another" 
@@ -1399,6 +1415,49 @@ export default function AdminPage() {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Pixel Stats Modal */}
+        {pixelStats && (
+          <div style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 9999, padding: 20
+          }} onClick={() => setPixelStats(null)}>
+            <div style={{
+              maxWidth: '500px', width: '100%', background: '#FFF', borderRadius: 16,
+              padding: '32px 24px', border: '1.5px solid #FCD4E0', maxHeight: '80vh', overflowY: 'auto'
+            }} onClick={e => e.stopPropagation()}>
+              <h3 style={{ margin: '0 0 20px', fontSize: 18 }}>📊 Pixel Event Log</h3>
+              
+              <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: 100, textAlign: 'center', padding: '12px', background: '#FCE4EC', borderRadius: 10 }}>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: '#E8386D' }}>{pixelStats.counts.lead || 0}</div>
+                  <div style={{ fontSize: 11, color: '#888' }}>Leads</div>
+                </div>
+                <div style={{ flex: 1, minWidth: 100, textAlign: 'center', padding: '12px', background: '#FFF3E0', borderRadius: 10 }}>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: '#F57C00' }}>{pixelStats.counts.complete_registration || 0}</div>
+                  <div style={{ fontSize: 11, color: '#888' }}>CompleteReg</div>
+                </div>
+                <div style={{ flex: 1, minWidth: 100, textAlign: 'center', padding: '12px', background: '#E8F5E9', borderRadius: 10 }}>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: '#388E3C' }}>{pixelStats.counts.purchase || 0}</div>
+                  <div style={{ fontSize: 11, color: '#888' }}>Purchase</div>
+                </div>
+              </div>
+
+              <div style={{ fontSize: 12, color: '#999', marginBottom: 8 }}>Last 20 events:</div>
+              <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+                {pixelStats.events.map((e, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #F5F5F5', fontSize: 12 }}>
+                    <span style={{ fontWeight: 700 }}>{e.event_name}</span>
+                    <span style={{ color: '#AAA' }}>{new Date(e.created_at).toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => setPixelStats(null)} style={{ marginTop: 16, width: '100%', padding: '10px', borderRadius: 8, border: '1.5px solid #EBEBEB', background: '#FFF', cursor: 'pointer', fontFamily: 'inherit' }}>Close</button>
             </div>
           </div>
         )}
