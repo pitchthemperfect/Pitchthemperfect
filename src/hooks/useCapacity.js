@@ -58,7 +58,7 @@ export function useCapacity() {
               counts.watcher++
             } else if (r.role === 'pitcher' && r.status === 'paid') {
               // Capacity is split by pitchee gender
-              if (r.pitchee_gender === 'female') {
+              if ((r.pitchee_gender || '').toLowerCase() === 'female') {
                 counts.pitcher_female++
               } else {
                 counts.pitcher_male++
