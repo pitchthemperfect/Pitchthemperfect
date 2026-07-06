@@ -1240,7 +1240,7 @@ export default function AdminPage() {
                           {row.role === 'pitcher' ? '🎤 Pitcher' : '👁 Watcher'}
                         </span>
                       </td>
-                      <td style={{ padding: '20px 20px', color: '#555', maxWidth: 320, lineHeight: 1.5 }}>
+                      <td style={{ padding: '20px 20px', color: '#555', maxWidth: 320, lineHeight: 1.5, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                         {row.details}
                       </td>
                       <td style={{ padding: '20px 20px' }}>
