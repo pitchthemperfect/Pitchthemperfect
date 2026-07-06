@@ -1240,38 +1240,34 @@ export default function AdminPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 13.5 }}>
               <thead>
                 <tr style={{ background: '#FFF5F8', borderBottom: '1.5px solid #FCD4E0' }}>
-                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Name</th>
-                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Contact Info</th>
-                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Role</th>
-                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Details</th>
-                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>📝 Pitch</th>
-                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Status</th>
-                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Attended</th>
-                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Amount</th>
-                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Registered At</th>
-                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Actions</th>
+                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 140 }}>Name</th>
+                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 60 }}>Role</th>
+                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 280 }}>Details</th>
+                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 180 }}>📝 Pitch</th>
+                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 80 }}>Status</th>
+                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 60 }}>Att.</th>
+                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 130 }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="9" style={{ padding: '48px 20px', textAlign: 'center', color: '#888' }}>
+                    <td colSpan="7" style={{ padding: '48px 20px', textAlign: 'center', color: '#888' }}>
                       <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite', marginRight: 8 }}>⏳</span> Loading registrations from Supabase...
                     </td>
                   </tr>
                 ) : filteredData.length === 0 ? (
                   <tr>
-                    <td colSpan="9" style={{ padding: '48px 20px', textAlign: 'center', color: '#888' }}>
+                    <td colSpan="7" style={{ padding: '48px 20px', textAlign: 'center', color: '#888' }}>
                       No registration matching the filters found.
                     </td>
                   </tr>
                 ) : (
                   filteredData.map(row => (
                     <tr key={row.id} style={{ borderBottom: '1px solid #FFF5F7', transition: 'background 0.15s' }} className="admin-table-row">
-                      <td style={{ padding: '20px 20px', fontWeight: 700, color: '#111' }}>{row.name}</td>
-                      <td style={{ padding: '20px 20px', color: '#333' }}>
-                        <div style={{ fontWeight: 600 }}>{row.phone}</div>
-                        <div style={{ fontSize: 12, color: '#666', marginTop: 2 }}>{row.email}</div>
+                      <td style={{ padding: '20px 20px' }}>
+                        <div style={{ fontWeight: 700, color: '#111' }}>{row.name}</div>
+                        <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>{row.email}</div>
                       </td>
                       <td style={{ padding: '20px 20px' }}>
                         <span style={{ 
@@ -1308,12 +1304,6 @@ export default function AdminPage() {
                         }}>
                           {row.status}
                         </span>
-                      </td>
-                      <td style={{ padding: '20px 20px', fontWeight: 700, color: '#111' }}>
-                        {row.amount}
-                      </td>
-                      <td style={{ padding: '20px 20px', color: '#555' }}>
-                        {row.date}
                       </td>
                       <td style={{ padding: '20px 20px' }}>
                         {/* Attended checkbox */}
