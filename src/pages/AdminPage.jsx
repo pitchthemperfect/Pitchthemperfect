@@ -527,9 +527,9 @@ export default function AdminPage() {
     return {
       total: data.length,
       pitchers: pitchers.length,
-      pitchersMale: pitchers.filter(r => (r.pitchee_gender || '').toLowerCase() !== 'female').length,
+      pitchersMale: pitchers.filter(r => (r.pitchee_gender || '').toLowerCase() === 'male').length,
       pitchersFemale: pitchers.filter(r => (r.pitchee_gender || '').toLowerCase() === 'female').length,
-      pitchersMaleConfirmed: pitchers.filter(r => (r.pitchee_gender || '').toLowerCase() !== 'female' && r.status === 'paid').length,
+      pitchersMaleConfirmed: pitchers.filter(r => (r.pitchee_gender || '').toLowerCase() === 'male' && r.status === 'paid').length,
       pitchersFemaleConfirmed: pitchers.filter(r => (r.pitchee_gender || '').toLowerCase() === 'female' && r.status === 'paid').length,
       paidWatchers: watchers.filter(r => r.status === 'paid').length,
       pendingWatchers: watchers.filter(r => r.status === 'pending').length,

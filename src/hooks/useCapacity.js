@@ -60,9 +60,10 @@ export function useCapacity() {
               // Capacity is split by pitchee gender
               if ((r.pitchee_gender || '').toLowerCase() === 'female') {
                 counts.pitcher_female++
-              } else {
+              } else if ((r.pitchee_gender || '').toLowerCase() === 'male') {
                 counts.pitcher_male++
               }
+              // empty pitchee_gender → don't count in either
             }
           }
         }
