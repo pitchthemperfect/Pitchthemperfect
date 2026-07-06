@@ -455,7 +455,7 @@ export default function AdminPage() {
       .from('registrations')
       .update({ status: newStatus })
       .eq('id', row.id)
-    if (error) { console.error('Confirm error:', error); return }
+    if (error) { console.error('Confirm error:', error); alert('Failed to update: ' + error.message); return }
     setData(prev => prev.map(r => r.id === row.id ? { ...r, status: newStatus } : r))
     // Trigger confirmation email
     try {
