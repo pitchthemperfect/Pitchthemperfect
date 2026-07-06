@@ -6,6 +6,7 @@ import ChipGroup from '../components/ChipGroup'
 import ConsentCheckbox from '../components/ConsentCheckbox'
 import BackButton from '../components/BackButton'
 import ErrorBanner from '../components/ErrorBanner'
+import { useCapacity } from '../hooks/useCapacity'
 
 const RELATIONSHIP_OPTIONS = [
   { value: 'friend',    label: 'Friend' },
@@ -35,7 +36,9 @@ export default function PitcherStep2() {
   const [form, setForm] = useState(getInitial)
   const [errors, setErrors] = useState({})
   const [showErrorBanner, setShowErrorBanner] = useState(false)
+  const [genderFullWarning, setGenderFullWarning] = useState('')
   const timeoutRef = useRef(null)
+  const { isSoldOut } = useCapacity()
 
   useEffect(() => {
     return () => {
@@ -46,6 +49,11 @@ export default function PitcherStep2() {
   const set = (k, v) => {
     setForm(f => ({ ...f, [k]: v }))
     setErrors(e => ({ ...e, [k]: '' }))
+    if (k === 'pitcheeGender') {
+      // Check if that gender is full
+      const full = v === 'female' ? isSoldOut.pitcher_female : isSoldOut.pitcher_male
+      setGenderFullWarning(full ? `This category is currently full. You can still nominate, but you'll be placed on the waitlist.` : '')
+    }
     if (Object.keys(errors).length <= 1) {
       setShowErrorBanner(false)
     }
@@ -126,6 +134,15 @@ export default function PitcherStep2() {
             required
             error={errors.pitcheeGender}
           />
+
+          {genderFullWarning && (
+            <div style={{
+              padding: '12px 16px', borderRadius: 10, background: '#FFFBF0',
+              border: '1.5px solid #F0C000', marginTop: 8, marginBottom: 8
+            }}>
+              <p style={{ fontSize: 13, color: '#B8860B', fontWeight: 600, margin: 0 }}>⚠️ {genderFullWarning}</p>
+            </div>
+          )}
 
           <ChipGroup
             label="Can both of you attend in person?"

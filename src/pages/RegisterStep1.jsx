@@ -37,9 +37,9 @@ export default function RegisterStep1() {
   const timeoutRef = useRef(null)
   const { remaining, isSoldOut, eventId } = useCapacity()
 
-  const pitcherFull = isSoldOut.pitcher_male && isSoldOut.pitcher_female
+  const pitcherBlocked = isSoldOut.pitcher_male && isSoldOut.pitcher_female
   const watcherFull = isSoldOut.watcher
-  const selectedIsFull = (form.role === 'pitcher' && pitcherFull) || (form.role === 'watcher' && watcherFull)
+  const selectedIsFull = (form.role === 'pitcher' && pitcherBlocked) || (form.role === 'watcher' && watcherFull)
 
   useEffect(() => {
     return () => {
