@@ -1200,6 +1200,7 @@ export default function AdminPage() {
                   <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Contact Info</th>
                   <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Role</th>
                   <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Details</th>
+                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>📝 Pitch</th>
                   <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Status</th>
                   <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Attended</th>
                   <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111' }}>Amount</th>
@@ -1242,6 +1243,12 @@ export default function AdminPage() {
                       </td>
                       <td style={{ padding: '20px 20px', color: '#555', maxWidth: 320, lineHeight: 1.5, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                         {row.details}
+                      </td>
+                      <td style={{ padding: '20px 20px', color: '#333', maxWidth: 280, lineHeight: 1.5, wordBreak: 'break-word', overflowWrap: 'break-word', fontSize: 13 }}>
+                        {row.role === 'pitcher' && row.pitch
+                          ? <span style={{ color: '#111', fontWeight: 600 }}>"{row.pitch}"</span>
+                          : <span style={{ color: '#CCC' }}>—</span>
+                        }
                       </td>
                       <td style={{ padding: '20px 20px' }}>
                         <span style={{ 
