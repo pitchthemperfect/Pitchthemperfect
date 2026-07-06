@@ -522,6 +522,7 @@ export default function AdminPage() {
       pendingWatchers: watchers.filter(r => r.status === 'pending').length,
       pitchersConfirmed: pitchers.filter(r => r.status === 'confirmed' || r.status === 'pitch').length,
       pitchersPending: pitchers.filter(r => r.status === 'pending').length,
+      totalPaid: watchers.filter(r => r.status === 'paid').length + pitchers.filter(r => r.status === 'confirmed' || r.status === 'pitch').length,
       waitlist: data.filter(r => r.status === 'waitlist').length,
       watchersTotal: watchers.length,
     }
@@ -731,12 +732,10 @@ export default function AdminPage() {
         {/* Stats Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
           {[
-            { label: 'Total Signups', val: stats.total, color: '#111111', icon: '👥', sub: null },
+            { label: 'Total Paid', val: stats.totalPaid, color: '#2E7D32', icon: '💳', sub: `${stats.pitchersConfirmed} pitcher + ${stats.paidWatchers} watcher` },
             { label: 'Pitchers (M)', val: stats.pitchersMale, color: '#E8386D', icon: '🎤♂️', sub: `cap: ${capPitcherMaleInput}` },
             { label: 'Pitchers (F)', val: stats.pitchersFemale, color: '#E8386D', icon: '🎤♀️', sub: `cap: ${capPitcherFemaleInput}` },
-            { label: 'Pitcher Confirmed', val: stats.pitchersConfirmed, color: '#2E7D32', icon: '✅', sub: `pending: ${stats.pitchersPending}` },
             { label: 'Watchers', val: stats.watchersTotal, color: '#E8386D', icon: '👁', sub: `cap: ${capWatcherInput}` },
-            { label: 'Watcher Paid', val: stats.paidWatchers, color: '#2E7D32', icon: '💳', sub: `pending: ${stats.pendingWatchers}` },
             { label: 'Waitlist', val: stats.waitlist, color: '#B8860B', icon: '📋', sub: 'overflow' },
             { label: 'Pitcher M left', val: Math.max(0, parseInt(capPitcherMaleInput) - stats.pitchersMale), color: '#E8386D', icon: '🎤♂️', sub: `of ${capPitcherMaleInput}` },
             { label: 'Pitcher F left', val: Math.max(0, parseInt(capPitcherFemaleInput) - stats.pitchersFemale), color: '#E8386D', icon: '🎤♀️', sub: `of ${capPitcherFemaleInput}` },
@@ -1377,12 +1376,10 @@ export default function AdminPage() {
             {/* Stats Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
               {[
-                { label: 'Total Signups', val: stats.total, icon: '👥' },
+                { label: 'Total Paid', val: stats.totalPaid, icon: '💳', sub: `${stats.pitchersConfirmed} pitcher + ${stats.paidWatchers} watcher` },
                 { label: 'Pitchers (M)', val: stats.pitchersMale, icon: '🎤♂️', sub: `cap: ${capPitcherMaleInput}` },
                 { label: 'Pitchers (F)', val: stats.pitchersFemale, icon: '🎤♀️', sub: `cap: ${capPitcherFemaleInput}` },
-                { label: 'Pitcher Confirmed', val: stats.pitchersConfirmed, icon: '✅', sub: `pending: ${stats.pitchersPending}` },
                 { label: 'Watchers', val: stats.watchersTotal, icon: '👁', sub: `cap: ${capWatcherInput}` },
-                { label: 'Watcher Paid', val: stats.paidWatchers, icon: '💳', sub: `pending: ${stats.pendingWatchers}` },
                 { label: 'Waitlist', val: stats.waitlist, icon: '📋' },
                 { label: 'Pitcher M left', val: Math.max(0, parseInt(capPitcherMaleInput) - stats.pitchersMale), icon: '🎤♂️', sub: `of ${capPitcherMaleInput}` },
                 { label: 'Pitcher F left', val: Math.max(0, parseInt(capPitcherFemaleInput) - stats.pitchersFemale), icon: '🎤♀️', sub: `of ${capPitcherFemaleInput}` },
