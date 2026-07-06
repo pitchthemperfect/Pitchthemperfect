@@ -716,7 +716,7 @@ export default function AdminPage() {
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               style={{
                 flex: 1, padding: '12px 16px', borderRadius: 9, border: 'none',
-                background: activeTab === tab.id ? '#111' : 'transparent',
+                background: activeTab === tab.id ? '#E8386D' : 'transparent',
                 color: activeTab === tab.id ? '#FFF' : '#888',
                 fontWeight: 700, fontSize: 13.5, cursor: 'pointer',
                 fontFamily: 'inherit', transition: 'all 0.15s'
@@ -1253,18 +1253,21 @@ export default function AdminPage() {
                 {loading ? (
                   <tr>
                     <td colSpan="7" style={{ padding: '48px 20px', textAlign: 'center', color: '#888' }}>
-                      <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite', marginRight: 8 }}>⏳</span> Loading registrations from Supabase...
+                      <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite', marginRight: 8 }}>⏳</span> Loading registrations...
                     </td>
                   </tr>
                 ) : filteredData.length === 0 ? (
                   <tr>
-                    <td colSpan="7" style={{ padding: '48px 20px', textAlign: 'center', color: '#888' }}>
-                      No registration matching the filters found.
+                    <td colSpan="7" style={{ padding: '48px 20px', textAlign: 'center' }}>
+                      <div style={{ color: '#CCC', fontSize: 48, marginBottom: 12 }}>📭</div>
+                      <div style={{ color: '#888', fontWeight: 600, fontSize: 14 }}>No registrations found</div>
                     </td>
                   </tr>
                 ) : (
                   filteredData.map(row => (
-                    <tr key={row.id} style={{ borderBottom: '1px solid #FFF5F7', transition: 'background 0.15s' }} className="admin-table-row">
+                    <tr key={row.id} style={{ borderBottom: '1px solid #FFF5F7', transition: 'background 0.15s', cursor: 'default' }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#FFFBFD'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                       <td style={{ padding: '20px 20px' }}>
                         <div style={{ fontWeight: 700, color: '#111' }}>{row.name}</div>
                         <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>{row.email}</div>
@@ -1286,7 +1289,7 @@ export default function AdminPage() {
                       </td>
                       <td style={{ padding: '20px 20px', color: '#333', maxWidth: 280, lineHeight: 1.5, wordBreak: 'break-word', overflowWrap: 'break-word', fontSize: 13 }}>
                         {row.role === 'pitcher' && row.pitch
-                          ? <span style={{ color: '#111', fontWeight: 600 }}>"{row.pitch}"</span>
+                          ? <span style={{ color: '#111', fontWeight: 600 }}>"{row.pitch.length > 80 ? row.pitch.slice(0, 80) + '...' : row.pitch}"</span>
                           : <span style={{ color: '#CCC' }}>—</span>
                         }
                       </td>
