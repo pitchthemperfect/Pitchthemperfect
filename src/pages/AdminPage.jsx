@@ -518,6 +518,8 @@ export default function AdminPage() {
       pitchers: pitchers.length,
       pitchersMale: pitchers.filter(r => r.pitchee_gender !== 'female').length,
       pitchersFemale: pitchers.filter(r => r.pitchee_gender === 'female').length,
+      pitchersMaleConfirmed: pitchers.filter(r => r.pitchee_gender !== 'female' && (r.status === 'confirmed' || r.status === 'pitch')).length,
+      pitchersFemaleConfirmed: pitchers.filter(r => r.pitchee_gender === 'female' && (r.status === 'confirmed' || r.status === 'pitch')).length,
       paidWatchers: watchers.filter(r => r.status === 'paid').length,
       pendingWatchers: watchers.filter(r => r.status === 'pending').length,
       pitchersConfirmed: pitchers.filter(r => r.status === 'confirmed' || r.status === 'pitch').length,
@@ -733,9 +735,9 @@ export default function AdminPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
           {[
             { label: 'Total Paid', val: stats.totalPaid, color: '#2E7D32', icon: '💳', sub: `${stats.pitchersConfirmed} pitcher + ${stats.paidWatchers} watcher` },
-            { label: 'Pitchers (M)', val: stats.pitchersMale, color: '#E8386D', icon: '🎤♂️', sub: `cap: ${capPitcherMaleInput}` },
-            { label: 'Pitchers (F)', val: stats.pitchersFemale, color: '#E8386D', icon: '🎤♀️', sub: `cap: ${capPitcherFemaleInput}` },
-            { label: 'Watchers', val: stats.watchersTotal, color: '#E8386D', icon: '👁', sub: `cap: ${capWatcherInput}` },
+            { label: 'Pitchers (M)', val: stats.pitchersMaleConfirmed, color: '#E8386D', icon: '🎤♂️', sub: `${stats.pitchersMale} total · cap: ${capPitcherMaleInput}` },
+            { label: 'Pitchers (F)', val: stats.pitchersFemaleConfirmed, color: '#E8386D', icon: '🎤♀️', sub: `${stats.pitchersFemale} total · cap: ${capPitcherFemaleInput}` },
+            { label: 'Watchers', val: stats.paidWatchers, color: '#E8386D', icon: '👁', sub: `${stats.watchersTotal} total · cap: ${capWatcherInput}` },
             { label: 'Waitlist', val: stats.waitlist, color: '#B8860B', icon: '📋', sub: 'overflow' },
             { label: 'Pitcher M left', val: Math.max(0, parseInt(capPitcherMaleInput) - stats.pitchersMale), color: '#E8386D', icon: '🎤♂️', sub: `of ${capPitcherMaleInput}` },
             { label: 'Pitcher F left', val: Math.max(0, parseInt(capPitcherFemaleInput) - stats.pitchersFemale), color: '#E8386D', icon: '🎤♀️', sub: `of ${capPitcherFemaleInput}` },
@@ -1326,6 +1328,20 @@ export default function AdminPage() {
                               cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', marginRight: 6
                             }}>💳 Confirm</button>
                         )}
+                        {/* Status dropdown — change any status */}
+                        <select value={row.status} onChange={e => handleUpdateStatus(row.id, e.target.value)}
+                          style={{
+                            padding: '5px 8px', borderRadius: 6, border: '1.5px solid #EAECEF',
+                            fontSize: 11.5, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer',
+                            background: '#FFF', color: '#555', maxWidth: 110
+                          }}>
+                          <option value="pending">pending</option>
+                          <option value="paid">paid</option>
+                          <option value="pitch">pitch</option>
+                          <option value="confirmed">confirmed</option>
+                          <option value="waitlist">waitlist</option>
+                          <option value="declined">declined</option>
+                        </select>
                         {/* Actions: approve/decline for pitchers */}
                         {row.role === 'pitcher' && row.status === 'pitch' ? (
                           <div style={{ display: 'flex', gap: 6 }}>
@@ -1377,9 +1393,9 @@ export default function AdminPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
               {[
                 { label: 'Total Paid', val: stats.totalPaid, icon: '💳', sub: `${stats.pitchersConfirmed} pitcher + ${stats.paidWatchers} watcher` },
-                { label: 'Pitchers (M)', val: stats.pitchersMale, icon: '🎤♂️', sub: `cap: ${capPitcherMaleInput}` },
-                { label: 'Pitchers (F)', val: stats.pitchersFemale, icon: '🎤♀️', sub: `cap: ${capPitcherFemaleInput}` },
-                { label: 'Watchers', val: stats.watchersTotal, icon: '👁', sub: `cap: ${capWatcherInput}` },
+                { label: 'Pitchers (M)', val: stats.pitchersMaleConfirmed, icon: '🎤♂️', sub: `${stats.pitchersMale} total · cap: ${capPitcherMaleInput}` },
+                { label: 'Pitchers (F)', val: stats.pitchersFemaleConfirmed, icon: '🎤♀️', sub: `${stats.pitchersFemale} total · cap: ${capPitcherFemaleInput}` },
+                { label: 'Watchers', val: stats.paidWatchers, icon: '👁', sub: `${stats.watchersTotal} total · cap: ${capWatcherInput}` },
                 { label: 'Waitlist', val: stats.waitlist, icon: '📋' },
                 { label: 'Pitcher M left', val: Math.max(0, parseInt(capPitcherMaleInput) - stats.pitchersMale), icon: '🎤♂️', sub: `of ${capPitcherMaleInput}` },
                 { label: 'Pitcher F left', val: Math.max(0, parseInt(capPitcherFemaleInput) - stats.pitchersFemale), icon: '🎤♀️', sub: `of ${capPitcherFemaleInput}` },
