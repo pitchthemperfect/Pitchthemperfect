@@ -1243,10 +1243,9 @@ export default function AdminPage() {
                 <tr style={{ background: '#FFF5F8', borderBottom: '1.5px solid #FCD4E0' }}>
                   <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 140 }}>Name</th>
                   <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 60 }}>Role</th>
-                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 280 }}>Details</th>
+                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 250 }}>Details</th>
                   <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 180 }}>📝 Pitch</th>
-                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 80 }}>Status</th>
-                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 60 }}>Att.</th>
+                  <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 100 }}>Status</th>
                   <th style={{ padding: '16px 20px', fontWeight: 800, color: '#111', minWidth: 130 }}>Actions</th>
                 </tr>
               </thead>
@@ -1295,87 +1294,47 @@ export default function AdminPage() {
                         }
                       </td>
                       <td style={{ padding: '20px 20px' }}>
-                        <span style={{ 
-                          display: 'inline-flex',
-                          padding: '6px 12px',
-                          borderRadius: 999,
-                          fontSize: 11,
-                          fontWeight: 700,
-                          textTransform: 'uppercase',
-                          background: row.status === 'paid' ? '#E8F5E9' : row.status === 'pitch' ? '#FFF0F4' : row.status === 'waitlist' ? '#FFFBF0' : '#FFFDE7',
-                          color: row.status === 'paid' ? '#2E7D32' : row.status === 'pitch' ? '#E8386D' : row.status === 'waitlist' ? '#B8860B' : '#F57F17',
-                          border: `1px solid ${row.status === 'paid' ? '#C8E6C9' : row.status === 'pitch' ? '#FCD4E0' : row.status === 'waitlist' ? '#F5E6C8' : '#FFF9C4'}`
-                        }}>
-                          {row.status}
-                        </span>
+                        <select value={row.status} onChange={e => handleUpdateStatus(row.id, e.target.value)}
+                          style={{
+                            padding: '6px 10px', borderRadius: 8, border: '1.5px solid #EAECEF',
+                            fontSize: 12.5, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer',
+                            background: row.status === 'paid' || row.status === 'confirmed' ? '#E8F5E9' : row.status === 'pending' ? '#FFFDE7' : '#FFF',
+                            color: row.status === 'paid' || row.status === 'confirmed' ? '#2E7D32' : row.status === 'pending' ? '#F57F17' : '#555',
+                            width: '100%', maxWidth: 110
+                          }}>
+                          <option value="pending">⏳ pending</option>
+                          <option value="paid">💳 paid</option>
+                          <option value="pitch">🎤 pitch</option>
+                          <option value="confirmed">✅ confirmed</option>
+                          <option value="waitlist">📋 waitlist</option>
+                          <option value="declined">❌ declined</option>
+                        </select>
                       </td>
-                      <td style={{ padding: '20px 20px' }}>
-                        {/* Attended checkbox */}
-                        <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 12, color: row.attended ? '#2E7D32' : '#AAA' }}>
-                          <input type="checkbox" checked={row.attended || false}
-                            onChange={() => handleToggleAttended(row.id, row.attended)}
-                            style={{ accentColor: '#E8386D', cursor: 'pointer' }} />
-                          {row.attended ? '✓ Yes' : 'Mark'}
-                        </label>
-                      </td>
-                      <td style={{ padding: '20px 20px' }}>
-                        {/* Actions: confirm payment for pending */}
+                      <td style={{ padding: '20px 20px', whiteSpace: 'nowrap' }}>
+                        {/* Confirm payment */}
                         {row.status === 'pending' && (
                           <button onClick={() => handleConfirmPayment(row)}
                             style={{
                               padding: '5px 12px', borderRadius: 6, border: '1.5px solid #E8386D',
                               background: '#FFF', color: '#E8386D', fontSize: 12, fontWeight: 700,
-                              cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', marginRight: 6
+                              cursor: 'pointer', fontFamily: 'inherit', marginRight: 6
                             }}>💳 Confirm</button>
                         )}
-                        {/* Status dropdown — change any status */}
-                        <select value={row.status} onChange={e => handleUpdateStatus(row.id, e.target.value)}
-                          style={{
-                            padding: '5px 8px', borderRadius: 6, border: '1.5px solid #EAECEF',
-                            fontSize: 11.5, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer',
-                            background: '#FFF', color: '#555', maxWidth: 110
-                          }}>
-                          <option value="pending">pending</option>
-                          <option value="paid">paid</option>
-                          <option value="pitch">pitch</option>
-                          <option value="confirmed">confirmed</option>
-                          <option value="waitlist">waitlist</option>
-                          <option value="declined">declined</option>
-                        </select>
-                        {/* Actions: approve/decline for pitchers */}
-                        {row.role === 'pitcher' && row.status === 'pitch' ? (
-                          <div style={{ display: 'flex', gap: 6 }}>
-                            <button onClick={() => handleUpdateStatus(row.id, 'confirmed')}
-                              style={{
-                                padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700,
-                                background: '#E8F5E9', color: '#2E7D32', border: '1px solid #C8E6C9', cursor: 'pointer'
-                              }}>✓ Approve</button>
-                            <button onClick={() => handleUpdateStatus(row.id, 'declined')}
-                              style={{
-                                padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700,
-                                background: '#FFEBEE', color: '#C62828', border: '1px solid #FFCDD2', cursor: 'pointer'
-                              }}>✕ Decline</button>
-                          </div>
-                        ) : row.status === 'waitlist' ? (
-                          <div style={{ display: 'flex', gap: 6 }}>
-                            <button onClick={() => handleUpdateStatus(row.id, row.role === 'pitcher' ? 'pitch' : 'pending')}
-                              title={row.role === 'pitcher' ? 'Move to active pitcher list' : 'Move to active watcher list'}
-                              style={{
-                                padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700,
-                                background: '#E8F5E9', color: '#2E7D32', border: '1px solid #C8E6C9', cursor: 'pointer'
-                              }}>↑ Promote</button>
-                          </div>
-                        ) : row.role === 'pitcher' && row.status === 'confirmed' ? (
-                          <span style={{ fontSize: 11, color: '#2E7D32', fontWeight: 600 }}>Approved ✓</span>
-                        ) : row.role === 'pitcher' && row.status === 'declined' ? (
-                          <span style={{ fontSize: 11, color: '#C62828', fontWeight: 600 }}>Declined</span>
-                        ) : null}
+                        {/* Attended check */}
+                        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer', fontSize: 11, color: row.attended ? '#2E7D32' : '#AAA' }}>
+                          <input type="checkbox" checked={row.attended || false} onChange={() => toggleAttended(row)}
+                            style={{ cursor: 'pointer', accentColor: '#E8386D' }} />
+                          Attended
+                        </label>
+                      </td>
+                      <td style={{ padding: '20px 20px' }}>
+                        {/* Actions: delete */}
                         <button onClick={() => handleDelete(row.id)}
                           style={{
-                            padding: '4px 10px', borderRadius: 6, fontSize: 10.5, fontWeight: 600,
-                            background: 'transparent', color: '#CCC', border: '1px solid #EEE', cursor: 'pointer',
-                            marginTop: 6
-                          }}>🗑 Delete</button>
+                            padding: '6px 12px', borderRadius: 6, border: '1px solid #EAECEF',
+                            background: '#FFF', color: '#999', fontSize: 11, fontWeight: 600,
+                            cursor: 'pointer', fontFamily: 'inherit'
+                          }}>🗑</button>
                       </td>
                     </tr>
                   ))
