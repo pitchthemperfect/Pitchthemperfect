@@ -51,39 +51,11 @@ export default function WatcherSuccess() {
       <div className="form-card" style={{ alignItems: 'center', textAlign: 'center', gap: 16, padding: '40px 24px' }}>
         <SuccessCheckIcon />
         <SparkleIcon />
-        <h2 className="success-title">You’re all set!</h2>
+        <h2 className="success-title">You're all set!</h2>
         <p className="success-body" style={{ margin: '0 auto', maxWidth: 320 }}>
           Your spot is secured. A confirmation has been sent to your email and WhatsApp.
           Get ready for a night of real pitches, real people, and real connections.
         </p>
-
-        <div style={{
-          width: '100%',
-          maxWidth: 320,
-          background: '#FFF5F7',
-          border: '1.5px solid #FCD4E0',
-          borderRadius: 12,
-          padding: '16px 20px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 12,
-          marginTop: 8,
-          textAlign: 'left'
-        }}>
-          {[
-            { icon: <CalendarIcon />, label: 'Event details', val: 'Sent to your email & WhatsApp' },
-            { icon: <CocktailIcon />, label: 'Drink voucher', val: 'Redeemable on the night' },
-            { icon: <HangerIcon />, label: 'Dress code', val: 'Smart casual' },
-          ].map((r, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ display: 'flex', flexShrink: 0 }}>{r.icon}</div>
-              <div>
-                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: '#D63B6B', letterSpacing: '0.04em' }}>{r.label}</p>
-                <p style={{ fontSize: 13, color: '#444444', fontWeight: 600, marginTop: 1 }}>{r.val}</p>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
     </PageShell>
   )
