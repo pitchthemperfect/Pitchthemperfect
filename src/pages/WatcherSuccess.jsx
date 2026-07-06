@@ -53,7 +53,7 @@ export default function WatcherSuccess() {
         <SparkleIcon />
         <h2 className="success-title">You're all set!</h2>
         <p className="success-body" style={{ margin: '0 auto', maxWidth: 320 }}>
-          Your spot is secured. A confirmation has been sent to your email and WhatsApp.
+          Your spot is secured. A confirmation has been sent to your email.
           Get ready for a night of real pitches, real people, and real connections.
         </p>
       </div>
