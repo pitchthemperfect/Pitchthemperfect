@@ -450,7 +450,7 @@ export default function AdminPage() {
 
   const handleConfirmPayment = async (row) => {
     if (!window.confirm(`Confirm payment for ${row.name}? This will send the confirmation email.`)) return
-    const newStatus = row.role === 'pitcher' ? 'pitch' : 'paid'
+    const newStatus = row.role === 'pitcher' ? 'confirmed' : 'paid'
     const { error } = await supabase
       .from('registrations')
       .update({ status: newStatus })
@@ -1333,7 +1333,7 @@ export default function AdminPage() {
                             }}>💳 Confirm</button>
                         )}
                         {/* Actions: approve/decline for pitchers */}
-                        {row.role === 'pitcher' && (row.status === 'pitch' || row.status === 'waitlist') ? (
+                        {row.role === 'pitcher' && row.status === 'pitch' ? (
                           <div style={{ display: 'flex', gap: 6 }}>
                             <button onClick={() => handleUpdateStatus(row.id, 'confirmed')}
                               style={{
