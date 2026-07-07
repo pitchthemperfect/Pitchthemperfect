@@ -22,7 +22,7 @@ const INITIAL_REGISTRATIONS = [
     email: 'sarah.ahmed@example.ae',
     role: 'pitcher',
     details: 'Nominated: Faisal, 28 (@faisal_dxb). Friend. Can attend: Yes',
-    status: 'pitch',
+    status: 'paid',
     date: '2026-07-03 20:30',
     amount: '-'
   },
@@ -44,7 +44,7 @@ const INITIAL_REGISTRATIONS = [
     email: 'layla.m@gmail.com',
     role: 'pitcher',
     details: 'Nominated: Humaid, 30 (@humaid_m). Colleague. Can attend: Yes',
-    status: 'pitch',
+    status: 'paid',
     date: '2026-07-03 18:04',
     amount: '-'
   },
@@ -1250,10 +1250,12 @@ export default function AdminPage() {
               <label style={{ fontSize: 13, fontWeight: 700, color: '#111' }}>Payment Status</label>
               <div style={{ display: 'flex', gap: 6 }}>
                 {[
-                  { value: 'all', label: 'All' },
-                  { value: 'paid', label: '💳 Paid' },
-                  { value: 'pending', label: '⏳ Unpaid' },
-                  { value: 'waitlist', label: '📋 Waitlist' },
+                  { value: 'all',       label: 'All' },
+                  { value: 'paid',      label: '💳 Paid' },
+                  { value: 'pending',   label: '⏳ Pending' },
+                  { value: 'confirmed', label: '✅ Confirmed' },
+                  { value: 'waitlist',  label: '📋 Waitlist' },
+                  { value: 'declined',  label: '❌ Declined' },
                 ].map(opt => (
                   <button
                     key={opt.value}
@@ -1348,16 +1350,29 @@ export default function AdminPage() {
                           style={{
                             padding: '6px 10px', borderRadius: 8, border: '1.5px solid #EAECEF',
                             fontSize: 12.5, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer',
-                            background: row.status === 'paid' || row.status === 'confirmed' ? '#E8F5E9' : row.status === 'pending' ? '#FFFDE7' : '#FFF',
-                            color: row.status === 'paid' || row.status === 'confirmed' ? '#2E7D32' : row.status === 'pending' ? '#F57F17' : '#555',
-                            width: '100%', maxWidth: 110
+                            background:
+                              row.status === 'paid'      ? '#E8F5E9' :
+                              row.status === 'confirmed' ? '#E3F2FD' :
+                              row.status === 'pending'   ? '#FFFDE7' :
+                              row.status === 'waitlist'  ? '#FFF3E0' :
+                              row.status === 'declined'  ? '#FFEBEE' : '#FFF',
+                            color:
+                              row.status === 'paid'      ? '#2E7D32' :
+                              row.status === 'confirmed' ? '#1565C0' :
+                              row.status === 'pending'   ? '#F57F17' :
+                              row.status === 'waitlist'  ? '#E65100' :
+                              row.status === 'declined'  ? '#C62828' : '#555',
+                            width: '100%', maxWidth: 120
                           }}>
-                          <option value="pending">⏳ pending</option>
-                          <option value="paid">💳 paid</option>
-                          <option value="pitch">🎤 pitch</option>
-                          <option value="confirmed">✅ confirmed</option>
-                          <option value="waitlist">📋 waitlist</option>
-                          <option value="declined">❌ declined</option>
+                          {/* Common statuses */}
+                          <option value="pending">⏳ Pending</option>
+                          <option value="paid">💳 Paid</option>
+                          {/* Pitcher-only: confirmed after pitch review */}
+                          {row.role === 'pitcher' && (
+                            <option value="confirmed">✅ Confirmed</option>
+                          )}
+                          <option value="waitlist">📋 Waitlist</option>
+                          <option value="declined">❌ Declined</option>
                         </select>
                       </td>
                       <td style={{ padding: '20px 20px', whiteSpace: 'nowrap' }}>
