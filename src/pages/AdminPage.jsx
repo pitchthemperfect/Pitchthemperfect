@@ -82,7 +82,6 @@ export default function AdminPage() {
   const [refreshing, setRefreshing] = useState(false)
   const [storyCards, setStoryCards] = useState([])
   const [showStoryCards, setShowStoryCards] = useState(false)
-  // refetch on mount
   const fetchersRef = useRef({})
 
   // Pixel stats
@@ -145,12 +144,6 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
-    if (!isAuthenticated) return
-
-    // Refetch on bfcache restore (browser back/forward)
-    const handlePageshow = (e) => { if (e.persisted) { fetchRegistrations(); fetchPrices() } }
-    window.addEventListener('pageshow', handlePageshow)
-
     if (!isAuthenticated) return
 
     const fetchRegistrations = async () => {
