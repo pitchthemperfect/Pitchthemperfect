@@ -1,13 +1,13 @@
 /**
  * Edge Function: create-payment
- * Creates a Ziina payment intent and returns the embedded/redirect URL.
  */
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
-const ZIINA_API_ORIGIN = "https://api-v2.ziina.com"
-const SUCCESS_URL = Deno.env.get("SUCCESS_URL") || "https://www.pitchthemperfect.com/success/watcher"
-const CANCEL_URL = Deno.env.get("CANCEL_URL") || "https://www.pitchthemperfect.com/registration"
+// API key loaded from Supabase secret (set via: supabase secrets set ZIINA_KEY=...)
+const ZIINA_KEY = Deno.env.get("ZIINA_KEY") ?? ""
+
+const BASE_URL = Deno.env.get("APP_BASE_URL") || "https://pitchthemperfect.vercel.app"
+const CANCEL_URL = Deno.env.get("CANCEL_URL") || `${BASE_URL}/registration`
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -22,31 +22,26 @@ serve(async (req) => {
 
   try {
     const { amount, role } = await req.json()
-    if (!amount) {
-      return new Response(JSON.stringify({ error: "Amount is required" }), {
-        status: 400, headers: { "Access-Control-Allow-Origin": "*" }
-      })
-    }
+    if (!amount) return new Response(JSON.stringify({ error: "Amount required" }), { status: 400, headers: { "Access-Control-Allow-Origin": "*" } })
 
-    const amountFils = Math.floor(parseFloat(amount) * 100)
-    const apiKey = Deno.env.get("ZIINA_API_KEY") || ""
-    const isTest = Deno.env.get("ZIINA_TEST_MODE") === "true"
-
-    console.log(`Creating payment: AED ${amount} (${amountFils} fils), test:${isTest}`)
+    // Route success URL based on role
+    const successUrl = role === 'pitcher'
+      ? `${BASE_URL}/success/pitcher`
+      : `${BASE_URL}/success/watcher`
 
     const payload = {
-      amount: amountFils,
+      amount: Math.floor(parseFloat(amount) * 100),
       currency_code: "AED",
       message: `${role === 'pitcher' ? 'Pitch Nomination' : 'Watcher Ticket'} - Pitch Them Perfect`,
-      test: isTest,
-      success_url: SUCCESS_URL,
+      test: false,
+      success_url: successUrl,
       cancel_url: CANCEL_URL,
     }
 
-    const resp = await fetch(`${ZIINA_API_ORIGIN}/api/payment_intent`, {
+    const resp = await fetch("https://api-v2.ziina.com/api/payment_intent", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
+        "Authorization": `Bearer ${ZIINA_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -54,14 +49,11 @@ serve(async (req) => {
 
     if (!resp.ok) {
       const err = await resp.text()
-      console.error('ZIINA error:', resp.status, err)
-      return new Response(JSON.stringify({ error: "Payment creation failed", detail: err, status: resp.status }), {
-        status: 500, headers: { "Access-Control-Allow-Origin": "*" }
-      })
+      return new Response(JSON.stringify({ error: err }), { status: 500, headers: { "Access-Control-Allow-Origin": "*" } })
     }
 
     const data = await resp.json()
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       id: data.id,
       embedded_url: data.embedded_url,
       redirect_url: data.redirect_url,

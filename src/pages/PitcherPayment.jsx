@@ -85,36 +85,25 @@ export default function PitcherPayment() {
         }).select('id').single()
 
         if (error) throw error
+        setRegistered(true)
         trackCompleteRegistration({ role: 'pitcher' })
 
-        // Get Ziina key from settings
-        const { data: keyData } = await supabase.from('settings').select('value').eq('key', 'ziina_api_key').single()
-        const ziinaKey = keyData?.value || ''
-        
-        // Call Ziina directly from frontend (Edge Function IP blocked by Cloudflare)
-        const ziinaRes = await fetch('https://api-v2.ziina.com/api/payment_intent', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${ziinaKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            amount: Math.floor(parseFloat(ticketPrice) * 100),
-            currency_code: 'AED',
-            message: 'Pitch Nomination — Pitch Them Perfect',
-            test: true,
-            success_url: `https://pitchthemperfect.com/success/pitcher`,
-            cancel_url: `https://pitchthemperfect.com/registration`,
-          }),
-        })
-        const ziina = await ziinaRes.json()
-        if (ziina.embedded_url) {
-          setEmbeddedUrl(ziina.embedded_url)
-          setPaymentId(ziina.id)
-          if (inserted?.id && ziina.id) {
-            supabase.from('registrations').update({ ziina_payment_id: ziina.id }).eq('id', inserted.id).then(() => {})
-          }
-        }
+        // Create Ziina payment via Edge Function
+        if (SUPABASE_URL) {
+          const res = await fetch(`${SUPABASE_URL}/functions/v1/create-payment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: ticketPrice, role: 'pitcher', registration_id: inserted?.id }),
+          })
+          const ziina = await res.json()
+          if (ziina.embedded_url) {
+            setEmbeddedUrl(ziina.embedded_url)
+            setPaymentId(ziina.id)
+            // Link payment to registration
+            if (inserted?.id && ziina.id) {
+              supabase.from('registrations').update({ ziina_payment_id: ziina.id }).eq('id', inserted.id).then(() => {})
+            }
+            setPaying(false)
             return
           }
         }

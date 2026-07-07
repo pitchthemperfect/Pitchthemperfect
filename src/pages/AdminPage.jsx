@@ -426,7 +426,6 @@ export default function AdminPage() {
       console.error('Status update error:', error)
       return
     }
-    // Optimistic update
     setData(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r))
   }
 
