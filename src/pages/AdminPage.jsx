@@ -170,10 +170,16 @@ export default function AdminPage() {
             phone: r.whatsapp,
             email: r.email,
             role: r.role,
-            // Pitcher details: their_name, their_age, pitchee_gender, relationship, instagram, can_attend, links
+            // Fields needed for stats
+            pitchee_gender: r.pitchee_gender || '',
+            gender: r.gender || '',
+            age_group: r.age_group || '',
+            looking_for: r.looking_for || '',
+            media_consent: r.media_consent || false,
+            // Pitcher details display
             details: r.role === 'pitcher'
               ? [
-                  r.their_name && `Nominating: ${r.their_name}${r.their_age ? `, age ${r.their_age}` : ''}`,
+                  r.their_name && `Nominating: ${r.their_name}`,
                   r.pitchee_gender && `(${r.pitchee_gender})`,
                   r.relationship && `Rel: ${r.relationship}`,
                   r.instagram && `IG: @${r.instagram.replace('@','')}`,
