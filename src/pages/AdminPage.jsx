@@ -416,9 +416,9 @@ export default function AdminPage() {
 
   // Export to CSV helper
   const handleExport = () => {
-    const headers = 'ID,Name,Phone,Email,Role,Details,Status,Date,Amount\n'
-    const csvContent = data.map(r => 
-      `"${r.id}","${r.name}","${r.phone}","${r.email}","${r.role}","${r.details.replace(/"/g, '""')}","${r.status}","${r.date}","${r.amount}"`
+    const headers = 'ID,Name,Phone,Email,Role,Pitchee Gender,Their Name,Instagram,Relationship,Can Attend,Pitch,Links,Status,Attended,Date,Amount\n'
+    const csvContent = filteredData.map(r => 
+      `"${r.id}","${r.name}","${r.phone}","${r.email}","${r.role}","${r.pitchee_gender||''}","${r.their_name||''}","${r.instagram||''}","${r.relationship||''}","${r.can_attend||''}","${(r.pitch||'').replace(/"/g,'""')}","${r.links||''}","${r.status}","${r.attended?'Yes':'No'}","${r.date}","${r.amount}"`
     ).join('\n')
     
     const blob = new Blob([headers + csvContent], { type: 'text/csv;charset=utf-8;' })
