@@ -170,9 +170,18 @@ export default function AdminPage() {
             phone: r.whatsapp,
             email: r.email,
             role: r.role,
-            details: r.role === 'pitcher' 
-              ? `Nominated: ${r.their_name || ''} (${r.pitchee_gender || ''}, ${r.relationship || ''}). Instagram: ${r.instagram || ''}. Can attend: ${r.can_attend || ''}. Pitch: ${r.pitch || ''}.${r.links ? ` Links: ${r.links}` : ''}`
-              : `Gender: ${r.gender || ''}, Age: ${r.age_group || ''}`,
+            // Pitcher details: their_name, their_age, pitchee_gender, relationship, instagram, can_attend, links
+            details: r.role === 'pitcher'
+              ? [
+                  r.their_name && `Nominating: ${r.their_name}${r.their_age ? `, age ${r.their_age}` : ''}`,
+                  r.pitchee_gender && `(${r.pitchee_gender})`,
+                  r.relationship && `Rel: ${r.relationship}`,
+                  r.instagram && `IG: @${r.instagram.replace('@','')}`,
+                  r.can_attend !== undefined && r.can_attend !== '' && `Both attend: ${r.can_attend}`,
+                  r.links && `Links: ${r.links}`,
+                ].filter(Boolean).join(' · ')
+              : `Gender: ${r.gender || '—'}, Age: ${r.age_group || '—'}`,
+            pitch: r.pitch || '',
             status: r.status,
             attended: r.attended || false,
             date: r.created_at ? new Date(r.created_at).toLocaleString('en-US', {
@@ -418,27 +427,35 @@ export default function AdminPage() {
   }
 
   const handleUpdateStatus = async (id, newStatus) => {
-    const { error } = await supabase
+    console.log('[Admin] updateStatus — id:', id, 'newStatus:', newStatus)
+    const { data: updated, error } = await supabase
       .from('registrations')
       .update({ status: newStatus })
       .eq('id', id)
+      .select('id, status')
     if (error) {
-      console.error('Status update error:', error)
+      console.error('[Admin] Status update FAILED:', JSON.stringify(error))
+      alert(`❌ Status update failed:\n${error.message || JSON.stringify(error)}`)
       return
     }
+    console.log('[Admin] Status updated OK:', updated)
     setData(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r))
   }
 
   const handleToggleAttended = async (id, current) => {
     const newVal = !current
-    const { error } = await supabase
+    console.log('[Admin] toggleAttended — id:', id, 'newVal:', newVal)
+    const { data: updated, error } = await supabase
       .from('registrations')
       .update({ attended: newVal })
       .eq('id', id)
+      .select('id, attended')
     if (error) {
-      console.error('Attended update error:', error)
+      console.error('[Admin] Attended update FAILED:', JSON.stringify(error))
+      alert(`❌ Attended update failed:\n${error.message || JSON.stringify(error)}`)
       return
     }
+    console.log('[Admin] Attended updated OK:', updated)
     setData(prev => prev.map(r => r.id === id ? { ...r, attended: newVal } : r))
   }
 
@@ -453,19 +470,36 @@ export default function AdminPage() {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this registration permanently?')) return
+    console.log('[Admin] delete — id:', id)
     const { error } = await supabase.from('registrations').delete().eq('id', id)
-    if (error) { console.error('Delete error:', error); return }
+    if (error) {
+      console.error('[Admin] Delete FAILED:', JSON.stringify(error))
+      alert(`❌ Delete failed:\n${error.message || JSON.stringify(error)}`)
+      return
+    }
+    console.log('[Admin] Deleted OK')
     setData(prev => prev.filter(r => r.id !== id))
   }
 
   const handleConfirmPayment = async (row) => {
     if (!window.confirm(`Confirm payment for ${row.name}? This will send the confirmation email.`)) return
     const newStatus = 'paid'
-    const { error } = await supabase
+    console.log('[Admin] confirmPayment — id:', row.id, 'name:', row.name)
+    const { data: updated, error } = await supabase
       .from('registrations')
       .update({ status: newStatus })
       .eq('id', row.id)
-    if (error) { console.error('Confirm error:', error); alert('Failed to update: ' + error.message); return }
+      .select('id, status')
+    if (error) {
+      console.error('[Admin] Confirm FAILED:', JSON.stringify(error))
+      alert(`❌ Confirm failed:\n${error.message || JSON.stringify(error)}`)
+      return
+    }
+    console.log('[Admin] Confirm OK — returned rows:', updated)
+    if (!updated || updated.length === 0) {
+      alert(`⚠️ Update sent but Supabase returned 0 rows changed.\nPossible RLS block or wrong ID match.\nCheck Supabase Dashboard → Table Editor → registrations`)
+      return
+    }
     setData(prev => prev.map(r => r.id === row.id ? { ...r, status: newStatus } : r))
     // Trigger confirmation email
     try {
@@ -1332,7 +1366,7 @@ export default function AdminPage() {
                         )}
                         {/* Attended check */}
                         <label style={{ display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer', fontSize: 11, color: row.attended ? '#2E7D32' : '#AAA' }}>
-                          <input type="checkbox" checked={row.attended || false} onChange={() => toggleAttended(row)}
+                          <input type="checkbox" checked={row.attended || false} onChange={() => handleToggleAttended(row.id, row.attended)}
                             style={{ cursor: 'pointer', accentColor: '#E8386D' }} />
                           Attended
                         </label>
