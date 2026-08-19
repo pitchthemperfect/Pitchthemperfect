@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../utils/supabaseClient'
 import { trackLead } from '../lib/tracking'
 
+// ─── SVG Icons ───
 const HeartIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'block' }}>
     <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
@@ -17,12 +18,12 @@ const CalendarIcon = () => (
 
 const MapPinIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="12" r="3" />
+    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" />
   </svg>
 )
 
-const ChevronDownIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+const DropdownArrowIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
     <polyline points="6 9 12 15 18 9" />
   </svg>
 )
@@ -100,7 +101,7 @@ export default function LandingPage() {
   return (
     <div className="landing-page">
       <div className="landing-inner">
-        {/* ─── Hero ─── */}
+        {/* ─── Hero Section ─── */}
         <section className="landing-hero-section">
           <div className="landing-hero-badge">
             <HeartIcon />
@@ -140,7 +141,7 @@ export default function LandingPage() {
           </p>
         </section>
 
-        {/* ─── Gallery / vibe ─── */}
+        {/* ─── Gallery / Vibe Section ─── */}
         <section className="landing-gallery-section">
           <p className="landing-section-eyebrow">The Vibe</p>
           <h2 className="landing-section-title">What to expect on the night</h2>
@@ -202,29 +203,34 @@ export default function LandingPage() {
           <p className="landing-section-eyebrow">Got Questions?</p>
           <h2 className="landing-section-title">Frequently Asked Questions</h2>
 
-          <div className="landing-faq-list">
-            {faqs.map((faq, index) => (
-              <div 
-                key={index} 
-                className={`landing-faq-item ${openFaq === index ? 'is-open' : ''}`}
-              >
-                <button 
-                  className="landing-faq-question" 
-                  onClick={() => toggleFaq(index)}
-                  type="button"
+          <div className="landing-faq-list-container">
+            {faqs.map((faq, index) => {
+              const isOpen = openFaq === index
+              return (
+                <div 
+                  key={index} 
+                  className={`landing-faq-item ${isOpen ? 'is-open' : ''}`}
                 >
-                  <span>{faq.question}</span>
-                  <span className="faq-icon">
-                    <ChevronDownIcon />
-                  </span>
-                </button>
-                {openFaq === index && (
-                  <div className="landing-faq-answer">
-                    {faq.answer}
+                  <button 
+                    className="landing-faq-question-button" 
+                    onClick={() => toggleFaq(index)}
+                    type="button"
+                    aria-expanded={isOpen}
+                  >
+                    <span className="faq-question-text">{faq.question}</span>
+                    <span className="faq-icon-wrapper">
+                      <DropdownArrowIcon />
+                    </span>
+                  </button>
+                  
+                  <div className={`landing-faq-answer-container ${isOpen ? 'is-visible' : ''}`}>
+                    <div className="landing-faq-answer-inner">
+                      {faq.answer}
+                    </div>
                   </div>
-                )}
-              </div>
-            ))}
+                </div>
+              )
+            })}
           </div>
         </section>
 
