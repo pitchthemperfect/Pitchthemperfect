@@ -105,9 +105,13 @@ export default function WatcherStep2() {
             error={errors.age}
           />
 
-          {/* Nationality Field matching ChipGroup typography & spacing */}
-          <div className="form-group">
-            <label htmlFor="nationality" className="chip-group-label">
+          {/* Nationality Field styled precisely after reference input */}
+          <div className="form-group" style={{ marginTop: '1.75rem' }}>
+            <label 
+              htmlFor="nationality" 
+              className="chip-group-label"
+              style={{ marginBottom: '0.6rem', display: 'block' }}
+            >
               Nationality <span className="req">*</span>
             </label>
 
@@ -115,26 +119,26 @@ export default function WatcherStep2() {
               id="nationality"
               type="text"
               className={`form-input ${errors.nationality ? 'is-invalid' : ''}`}
-              placeholder="Emiratis"
+              placeholder="e.g. Emiratis"
               value={form.nationality}
               onChange={e => set('nationality', e.target.value)}
               style={{
                 width: '100%',
-                padding: '1rem 1.25rem',
+                padding: '0.875rem 1.25rem',
                 fontSize: '1rem',
                 color: '#1a1a1a',
-                backgroundColor: '#f9f9f9',
-                border: errors.nationality ? '1px solid #dc2626' : '1px solid #e5e7eb',
-                borderRadius: '16px',
+                backgroundColor: '#fbfbfb',
+                border: errors.nationality ? '1px solid #dc2626' : '1px solid #e0e0e0',
+                borderRadius: '14px',
                 outline: 'none',
                 boxSizing: 'border-box',
                 fontFamily: 'inherit',
-                transition: 'border-color 0.2s ease'
+                transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
               }}
             />
 
             {errors.nationality && (
-              <span className="error-text">
+              <span className="error-text" style={{ marginTop: '0.4rem', display: 'block' }}>
                 {errors.nationality}
               </span>
             )}
