@@ -38,7 +38,7 @@ export default function WatcherStep2() {
   const [showErrorBanner, setShowErrorBanner] = useState(false)
   const timeoutRef = useRef(null)
 
-  // Get full list of countries/nationalities
+  // Ambil daftar negara/kewarganegaraan otomatis
   const countryOptions = useMemo(() => countryList().getData(), [])
 
   useEffect(() => {
@@ -81,14 +81,14 @@ export default function WatcherStep2() {
     navigate('/payment/watcher')
   }
 
-  // Custom CSS styles to match your design system
+  // Custom style agar dropdown pas dengan desain kamu
   const customSelectStyles = {
-    control: (base, state) => ({
+    control: (base) => ({
       ...base,
       backgroundColor: '#fbfbfb',
       borderRadius: '14px',
       borderColor: errors.nationality ? '#dc2626' : '#e0e0e0',
-      padding: '0.2rem 0.5rem',
+      padding: '0.25rem 0.4rem',
       boxShadow: 'none',
       fontSize: '1rem',
       fontFamily: 'inherit',
@@ -148,7 +148,7 @@ export default function WatcherStep2() {
             error={errors.age}
           />
 
-          {/* Searchable Dropdown Field */}
+          {/* Dropdown Kewarganegaraan */}
           <div className="form-group" style={{ marginTop: '1.75rem' }}>
             <label 
               htmlFor="nationality" 
@@ -163,7 +163,7 @@ export default function WatcherStep2() {
               options={countryOptions}
               value={form.nationality}
               onChange={option => set('nationality', option)}
-              placeholder="Select or search nationality..."
+              placeholder="Select nationality..."
               styles={customSelectStyles}
               isSearchable
             />
