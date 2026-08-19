@@ -26,6 +26,35 @@ const GENDER_OPTIONS = [
   { value: 'female', label: 'Female' },
 ]
 
+const NATIONALITIES = [
+  "Emirati", "Afghan", "Albanian", "Algerian", "American", "Andorran", "Angolan", "Antiguan", 
+  "Argentine", "Armenian", "Australian", "Austrian", "Azerbaijani", "Bahamian", "Bahraini", 
+  "Bangladeshi", "Barbadian", "Belarusian", "Belgian", "Belizean", "Beninese", "Bhutanese", 
+  "Bolivian", "Bosnian", "Brazilian", "British", "Bruneian", "Bulgarian", "Burkinabe", 
+  "Burmese", "Burundian", "Cambodian", "Cameroonian", "Canadian", "Cape Verdean", 
+  "Central African", "Chadian", "Chilean", "Chinese", "Colombian", "Comoran", "Congolese", 
+  "Costa Rican", "Croatian", "Cuban", "Cypriot", "Czech", "Danish", "Djiboutian", "Dominican", 
+  "Dutch", "Ecuadorean", "Egyptian", "Equatorial Guinean", "Eritrean", "Estonian", "Ethiopian", 
+  "Fijian", "Filipino", "Finnish", "French", "Gabonese", "Gambian", "Georgian", "German", 
+  "Ghanaian", "Greek", "Grenadian", "Guatemalan", "Guinean", "Guyanese", "Haitian", 
+  "Honduran", "Hungarian", "Icelandic", "Indian", "Indonesian", "Iranian", "Iraqi", "Irish", 
+  "Israeli", "Italian", "Ivorian", "Jamaican", "Japanese", "Jordanian", "Kazakhstani", 
+  "Kenyan", "Kuwaiti", "Kyrgyz", "Laotian", "Latvian", "Lebanese", "Liberian", "Libyan", 
+  "Liechtensteiner", "Lithuanian", "Luxembourgish", "Macedonian", "Malagasy", "Malawian", 
+  "Malaysian", "Maldivian", "Malian", "Maltese", "Marshallese", "Mauritanian", "Mauritian", 
+  "Mexican", "Micronesian", "Moldovan", "Monacan", "Mongolian", "Moroccan", "Mozambican", 
+  "Namibian", "Nauruan", "Nepalese", "New Zealander", "Nicaraguan", "Nigerian", "Nigerien", 
+  "North Korean", "Norwegian", "Omani", "Pakistani", "Palauan", "Palestinian", "Panamanian", 
+  "Papua New Guinean", "Paraguayan", "Peruvian", "Polish", "Portuguese", "Qatari", 
+  "Romanian", "Russian", "Rwandan", "Saint Lucian", "Salvadoran", "Samoan", "Saudi", 
+  "Scottish", "Senegalese", "Serbian", "Seychellois", "Sierra Leonean", "Singaporean", 
+  "Slovak", "Slovenian", "Somali", "South African", "South Korean", "Spanish", "Sri Lankan", 
+  "Sudanese", "Surinamese", "Swedish", "Swiss", "Syrian", "Taiwanese", "Tajik", "Tanzanian", 
+  "Thai", "Togolese", "Tongan", "Trinidadian", "Tunisian", "Turkish", "Turkmen", "Tuvaluan", 
+  "Ugandan", "Ukrainian", "Uruguayan", "Uzbek", "Vanuatu", "Venezuelan", "Vietnamese", 
+  "Welsh", "Yemeni", "Zambian", "Zimbabwean"
+]
+
 function getInitial() {
   try { const s = sessionStorage.getItem('ptp_pitcher2'); if (s) return JSON.parse(s) } catch (_) {}
   return { theirName: '', instagram: '', nationality: '', pitcheeGender: '', relationship: '', canAttend: '', pitch: '', links: '', consent: false }
@@ -63,7 +92,7 @@ export default function PitcherStep2() {
     const e = {}
     if (!form.theirName.trim())   e.theirName     = 'Please enter their name and age'
     if (!form.instagram.trim())   e.instagram     = 'Please enter their Instagram handle'
-    if (!form.nationality.trim()) e.nationality   = 'Please enter their nationality'
+    if (!form.nationality.trim()) e.nationality   = 'Please select their nationality'
     if (!form.relationship)       e.relationship  = 'Please select your relationship'
     if (!form.pitcheeGender)      e.pitcheeGender = 'Please select their gender'
     if (!form.canAttend)          e.canAttend     = 'Please answer this'
@@ -118,12 +147,46 @@ export default function PitcherStep2() {
             {errors.instagram && <span className="field-error">{errors.instagram}</span>}
           </div>
 
-          <div className="field">
-            <label className="field-label" htmlFor="nationality">Their Nationality <span className="req">*</span></label>
-            <input id="nationality" type="text" autoComplete="off" placeholder="e.g. Emiratis"
-              value={form.nationality} onChange={e => set('nationality', e.target.value)}
-              className={errors.nationality ? 'has-error' : ''} />
-            {errors.nationality && <span className="field-error">{errors.nationality}</span>}
+          {/* Nationality Dropdown */}
+          <div className="field" style={{ marginTop: '0.25rem' }}>
+            <label className="field-label" htmlFor="nationality" style={{ marginBottom: '0.25rem', display: 'block' }}>
+              Their Nationality <span className="req">*</span>
+            </label>
+            <select
+              id="nationality"
+              value={form.nationality}
+              onChange={e => set('nationality', e.target.value)}
+              className={errors.nationality ? 'has-error' : ''}
+              style={{
+                width: '100%',
+                padding: '0.75rem 1.25rem',
+                fontSize: '0.95rem',
+                color: form.nationality ? '#1a1a1a' : '#9ca3af',
+                backgroundColor: '#f7f7f8',
+                border: errors.nationality ? '1px solid #dc2626' : '1px solid #e2e8f0',
+                borderRadius: '16px',
+                outline: 'none',
+                boxSizing: 'border-box',
+                fontFamily: 'inherit',
+                appearance: 'none',
+                backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%3a6b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 1.25rem center',
+                backgroundSize: '0.9em',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <option value="" disabled hidden>
+                Emiratis
+              </option>
+              {NATIONALITIES.map(nat => (
+                <option key={nat} value={nat} style={{ color: '#1a1a1a' }}>
+                  {nat}
+                </option>
+              ))}
+            </select>
+            {errors.nationality && <span className="field-error" style={{ marginTop: '0.25rem', display: 'block' }}>{errors.nationality}</span>}
           </div>
 
           <ChipGroup
