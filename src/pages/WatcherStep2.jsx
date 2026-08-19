@@ -6,34 +6,39 @@ import ChipGroup from '../components/ChipGroup'
 import ConsentCheckbox from '../components/ConsentCheckbox'
 import BackButton from '../components/BackButton'
 import ErrorBanner from '../components/ErrorBanner'
+import { useCapacity } from '../hooks/useCapacity'
+
+const RELATIONSHIP_OPTIONS = [
+  { value: 'friend',    label: 'Friend' },
+  { value: 'family',    label: 'Family Member' },
+  { value: 'colleague', label: 'Colleague' },
+  { value: 'partner',   label: 'Partner' },
+  { value: 'other',     label: 'Other' },
+]
+
+const ATTEND_OPTIONS = [
+  { value: 'yes', label: 'Yes' },
+  { value: 'no',  label: 'No' },
+]
 
 const GENDER_OPTIONS = [
   { value: 'male',   label: 'Male' },
   { value: 'female', label: 'Female' },
 ]
 
-const AGE_OPTIONS = [
-  { value: '21-25', label: '21-25' },
-  { value: '26-30', label: '26-30' },
-  { value: '30-35', label: '30-35' },
-  { value: '35-40', label: '35-40' },
-  { value: '50+',   label: '50+' },
-]
-
 function getInitial() {
-  try { 
-    const s = sessionStorage.getItem('ptp_watcher2')
-    if (s) return JSON.parse(s) 
-  } catch (_) {}
-  return { gender: '', age: '', nationality: '', consent: false }
+  try { const s = sessionStorage.getItem('ptp_pitcher2'); if (s) return JSON.parse(s) } catch (_) {}
+  return { theirName: '', instagram: '', pitcheeGender: '', relationship: '', canAttend: '', pitch: '', links: '', consent: false }
 }
 
-export default function WatcherStep2() {
+export default function PitcherStep2() {
   const navigate = useNavigate()
   const [form, setForm] = useState(getInitial)
   const [errors, setErrors] = useState({})
   const [showErrorBanner, setShowErrorBanner] = useState(false)
+  const [genderFullWarning, setGenderFullWarning] = useState('')
   const timeoutRef = useRef(null)
+  const { isSoldOut } = useCapacity()
 
   useEffect(() => {
     return () => {
@@ -44,6 +49,11 @@ export default function WatcherStep2() {
   const set = (k, v) => {
     setForm(f => ({ ...f, [k]: v }))
     setErrors(e => ({ ...e, [k]: '' }))
+    if (k === 'pitcheeGender') {
+      // Check if that gender is full
+      const full = v === 'female' ? isSoldOut.pitcher_female : isSoldOut.pitcher_male
+      setGenderFullWarning(full ? `This category is currently full. You can still nominate, but you'll be placed on the waitlist.` : '')
+    }
     if (Object.keys(errors).length <= 1) {
       setShowErrorBanner(false)
     }
@@ -51,10 +61,13 @@ export default function WatcherStep2() {
 
   const validate = () => {
     const e = {}
-    if (!form.gender)            e.gender      = 'Please select your gender'
-    if (!form.age)               e.age         = 'Please select your age category'
-    if (!form.nationality.trim()) e.nationality = 'Please enter your nationality'
-    if (!form.consent)           e.consent     = 'Please accept to continue'
+    if (!form.theirName.trim()) e.theirName    = 'Please enter their name and age'
+    if (!form.instagram.trim()) e.instagram    = 'Please enter their Instagram handle'
+    if (!form.relationship)     e.relationship = 'Please select your relationship'
+    if (!form.pitcheeGender)    e.pitcheeGender = 'Please select their gender'
+    if (!form.canAttend)        e.canAttend    = 'Please answer this'
+    if (!form.pitch.trim())     e.pitch        = 'Please write your pitch'
+    if (!form.consent)          e.consent      = 'Please accept to continue'
     return e
   }
 
@@ -71,9 +84,24 @@ export default function WatcherStep2() {
       return
     }
     setShowErrorBanner(false)
-    sessionStorage.setItem('ptp_watcher2', JSON.stringify(form))
-    navigate('/payment/watcher')
+    sessionStorage.setItem('ptp_pitcher2', JSON.stringify(form))
+    navigate('/payment/pitcher')
   }
+
+  // Shared style definition matching the reference input
+  const inputStyle = (hasError) => ({
+    width: '100%',
+    padding: '0.875rem 1.25rem',
+    fontSize: '1rem',
+    color: '#1a1a1a',
+    backgroundColor: '#fbfbfb',
+    border: hasError ? '1px solid #dc2626' : '1px solid #e0e0e0',
+    borderRadius: '14px',
+    outline: 'none',
+    boxSizing: 'border-box',
+    fontFamily: 'inherit',
+    transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+  })
 
   return (
     <PageShell
@@ -86,78 +114,162 @@ export default function WatcherStep2() {
       <BackButton to="/registration" />
 
       <form onSubmit={handleSubmit} noValidate style={{ display: 'contents' }}>
-        <FormCard number="2" title="Audience Details">
-          <ChipGroup
-            label="Are you?"
-            options={GENDER_OPTIONS}
-            value={form.gender}
-            onChange={v => set('gender', v)}
-            required
-            error={errors.gender}
-          />
+        <FormCard number="2" title="Your Pitch">
 
-          <ChipGroup
-            label="Age Category"
-            options={AGE_OPTIONS}
-            value={form.age}
-            onChange={v => set('age', v)}
-            required
-            error={errors.age}
-          />
-
-          {/* Nationality Field styled precisely after reference input */}
+          {/* Their Name & Age */}
           <div className="form-group" style={{ marginTop: '1.75rem' }}>
             <label 
-              htmlFor="nationality" 
+              htmlFor="theirName" 
               className="chip-group-label"
               style={{ marginBottom: '0.6rem', display: 'block' }}
             >
-              Nationality <span className="req">*</span>
+              Their Name &amp; Age <span className="req">*</span>
             </label>
-
             <input
-              id="nationality"
+              id="theirName"
               type="text"
-              className={`form-input ${errors.nationality ? 'is-invalid' : ''}`}
-              placeholder="e.g. Emiratis"
-              value={form.nationality}
-              onChange={e => set('nationality', e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.875rem 1.25rem',
-                fontSize: '1rem',
-                color: '#1a1a1a',
-                backgroundColor: '#fbfbfb',
-                border: errors.nationality ? '1px solid #dc2626' : '1px solid #e0e0e0',
-                borderRadius: '14px',
-                outline: 'none',
-                boxSizing: 'border-box',
-                fontFamily: 'inherit',
-                transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
-              }}
+              autoComplete="off"
+              placeholder="e.g. Sarah, 26"
+              value={form.theirName}
+              onChange={e => set('theirName', e.target.value)}
+              className={`form-input ${errors.theirName ? 'is-invalid' : ''}`}
+              style={inputStyle(errors.theirName)}
             />
-
-            {errors.nationality && (
+            {errors.theirName && (
               <span className="error-text" style={{ marginTop: '0.4rem', display: 'block' }}>
-                {errors.nationality}
+                {errors.theirName}
               </span>
             )}
           </div>
+
+          {/* Their Instagram Handle */}
+          <div className="form-group" style={{ marginTop: '1.75rem' }}>
+            <label 
+              htmlFor="instagram" 
+              className="chip-group-label"
+              style={{ marginBottom: '0.6rem', display: 'block' }}
+            >
+              Their Instagram Handle <span className="req">*</span>
+            </label>
+            <input
+              id="instagram"
+              type="text"
+              autoComplete="off"
+              placeholder="@theirhandle"
+              value={form.instagram}
+              onChange={e => set('instagram', e.target.value)}
+              className={`form-input ${errors.instagram ? 'is-invalid' : ''}`}
+              style={inputStyle(errors.instagram)}
+            />
+            {errors.instagram && (
+              <span className="error-text" style={{ marginTop: '0.4rem', display: 'block' }}>
+                {errors.instagram}
+              </span>
+            )}
+          </div>
+
+          <ChipGroup
+            label="What's your relationship to them?"
+            options={RELATIONSHIP_OPTIONS}
+            value={form.relationship}
+            onChange={v => set('relationship', v)}
+            required
+            error={errors.relationship}
+          />
+
+          <ChipGroup
+            label="Their Gender"
+            options={GENDER_OPTIONS}
+            value={form.pitcheeGender}
+            onChange={v => set('pitcheeGender', v)}
+            required
+            error={errors.pitcheeGender}
+          />
+
+          {genderFullWarning && (
+            <div style={{
+              padding: '12px 16px', borderRadius: 10, background: '#FFFBF0',
+              border: '1.5px solid #F0C000', marginTop: 8, marginBottom: 8
+            }}>
+              <p style={{ fontSize: 13, color: '#B8860B', fontWeight: 600, margin: 0 }}>⚠️ {genderFullWarning}</p>
+            </div>
+          )}
+
+          <ChipGroup
+            label="Can both of you attend in person?"
+            options={ATTEND_OPTIONS}
+            value={form.canAttend}
+            onChange={v => set('canAttend', v)}
+            required
+            error={errors.canAttend}
+          />
+
+          {/* Tell us about them & pitch them! */}
+          <div className="form-group" style={{ marginTop: '1.75rem' }}>
+            <label 
+              htmlFor="pitch" 
+              className="chip-group-label"
+              style={{ marginBottom: '0.6rem', display: 'block' }}
+            >
+              Tell us about them &amp; pitch them! <span className="req">*</span>
+            </label>
+            <textarea
+              id="pitch"
+              autoComplete="off"
+              rows={5}
+              placeholder={'• Who are they? What makes them special?\n• Why should the room fall in love with them?\n• Make it charming, funny, heartfelt — whatever makes your pitch unforgettable'}
+              value={form.pitch}
+              onChange={e => set('pitch', e.target.value)}
+              className={`form-input ${errors.pitch ? 'is-invalid' : ''}`}
+              style={{
+                ...inputStyle(errors.pitch),
+                resize: 'vertical',
+                lineHeight: '1.5'
+              }}
+            />
+            {errors.pitch && (
+              <span className="error-text" style={{ marginTop: '0.4rem', display: 'block' }}>
+                {errors.pitch}
+              </span>
+            )}
+          </div>
+
+          {/* Optional: Links */}
+          <div className="form-group" style={{ marginTop: '1.75rem' }}>
+            <label 
+              htmlFor="links" 
+              className="chip-group-label"
+              style={{ marginBottom: '0.6rem', display: 'block' }}
+            >
+              Optional: Share any links that help your case.
+            </label>
+            <input
+              id="links"
+              type="text"
+              autoComplete="off"
+              placeholder="Instagram, LinkedIn, portfolio, articles, videos, or anything else we should see."
+              value={form.links}
+              onChange={e => set('links', e.target.value)}
+              className="form-input"
+              style={inputStyle(false)}
+            />
+          </div>
+
         </FormCard>
 
         <ConsentCheckbox
-          id="watcher-consent"
+          id="pitcher-consent"
           checked={form.consent}
           onChange={v => set('consent', v)}
           error={errors.consent}
         >
-          I'm happy for Pitch Them Perfect to contact me via WhatsApp and email about this event and future editions. <span className="req">*</span>
+          I confirm I have my friend's permission to nominate them. <span className="req">*</span>
         </ConsentCheckbox>
 
         <div className="submit-wrapper">
           {showErrorBanner && <ErrorBanner />}
-          <button id="btn-proceed" type="submit" className="btn-primary">
-            Proceed to Payment
+          <button id="btn-submit-pitch" type="submit" className="btn-primary">
+            Submit My Pitch
           </button>
         </div>
       </form>
