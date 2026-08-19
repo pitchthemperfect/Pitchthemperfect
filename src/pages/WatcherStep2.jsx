@@ -21,60 +21,33 @@ const AGE_OPTIONS = [
 ]
 
 const NATIONALITIES = [
-  "Afghan", "Albanian", "Algerian", "American", "Andorran", "Angolan", "Antiguans", "Argentinean", 
-  "Armenian", "Australian", "Austrian", "Azerbaijani", "Bahamian", "Bahraini", "Bangladeshi", 
-  "Barbadian", "Barbudans", "Batswana", "Belarusian", "Belgian", "Belizean", "Beninese", "Bhutanese", 
-  "Bolivian", "Bosnian", "Brazilian", "British", "Bruneian", "Bulgarian", "Burkinabe", "Burmese", 
-  "Burundian", "Cambodian", "Cameroonian", "Canadian", "Cape Verdean", "Central African", "Chadian", 
-  "Chilean", "Chinese", "Colombian", "Comoran", "Congolese", "Costa Rican", "Croatian", "Cuban", 
-  "Cypriot", "Czech", "Danish", "Djiboutian", "Dominican", "Dutch", "Dutchman", "Dutchwoman", 
-  "Ecuadorean", "Egyptian", "Emirati", "Equatorial Guinean", "Eritrean", "Estonian", "Ethiopian", 
-  "Fijian", "Filipino", "Finnish", "French", "Gabonese", "Gambian", "Georgian", "German", "Ghanaian", 
-  "Greek", "Grenadian", "Guatemalan", "Guinea-Bissauan", "Guinean", "Guyanese", "Haitian", 
-  "Herzegovinian", "Honduran", "Hungarian", "I-Kiribati", "Icelander", "Indian", "Indonesian", 
-  "Iranian", "Iraqi", "Irish", "Israeli", "Italian", "Ivorian", "Jamaican", "Japanese", "Jordanian", 
-  "Kazakhstani", "Kenyan", "Kittian and Nevisian", "Kuwaiti", "Kyrgyz", "Laotian", "Latvian", 
-  "Lebanese", "Liberian", "Libyan", "Liechtensteiner", "Lithuanian", "Luxembourger", "Macedonian", 
-  "Malagasy", "Malawian", "Malaysian", "Maldivan", "Malian", "Maltese", "Marshallese", "Mauritanian", 
-  "Mauritian", "Mexican", "Micronesian", "Moldovan", "Monacan", "Mongolian", "Moroccan", "Mosotho", 
-  "Motswana", "Mozambican", "Namibian", "Nauruan", "Nepalese", "New Zealander", "Ni-Vanuatu", 
-  "Nicaraguan", "Nigerian", "Nigerien", "North Korean", "Northern Irish", "Norwegian", "Omani", 
-  "Pakistani", "Palauan", "Palestinian", "Panamanian", "Papua New Guinean", "Paraguayan", "Peruvian", 
-  "Polish", "Portuguese", "Qatari", "Romanian", "Russian", "Rwandan", "Saint Lucian", "Salvadoran", 
-  "Samoan", "San Marinese", "Sao Tomean", "Saudi", "Scottish", "Senegalese", "Serbian", "Seychellois", 
-  "Sierra Leonean", "Singaporean", "Slovakian", "Slovenian", "Solomon Islander", "Somali", 
-  "South African", "South Korean", "Spanish", "Sri Lankan", "Sudanese", "Surinamer", "Swazi", 
-  "Swedish", "Swiss", "Syrian", "Taiwanese", "Tajik", "Tanzanian", "Thai", "Togolese", "Tongan", 
-  "Trinidadian or Tobagonian", "Tunisian", "Turkish", "Tuvaluan", "Ugandan", "UkrainianHere is the complete `WatcherStep2.jsx` code incorporating the custom styled nationality select dropdown (using native `<select>`) to replace the text input while preserving your exact visual layout and validation logic:
-
-```jsx
-import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { countries } from 'countries-list'
-import PageShell from '../components/PageShell'
-import FormCard from '../components/FormCard'
-import ChipGroup from '../components/ChipGroup'
-import ConsentCheckbox from '../components/ConsentCheckbox'
-import BackButton from '../components/BackButton'
-import ErrorBanner from '../components/ErrorBanner'
-
-const GENDER_OPTIONS = [
-  { value: 'male',   label: 'Male' },
-  { value: 'female', label: 'Female' },
+  "Emirati", "Afghan", "Albanian", "Algerian", "American", "Andorran", "Angolan", "Antiguan", 
+  "Argentine", "Armenian", "Australian", "Austrian", "Azerbaijani", "Bahamian", "Bahraini", 
+  "Bangladeshi", "Barbadian", "Belarusian", "Belgian", "Belizean", "Beninese", "Bhutanese", 
+  "Bolivian", "Bosnian", "Brazilian", "British", "Bruneian", "Bulgarian", "Burkinabe", 
+  "Burmese", "Burundian", "Cambodian", "Cameroonian", "Canadian", "Cape Verdean", 
+  "Central African", "Chadian", "Chilean", "Chinese", "Colombian", "Comoran", "Congolese", 
+  "Costa Rican", "Croatian", "Cuban", "Cypriot", "Czech", "Danish", "Djiboutian", "Dominican", 
+  "Dutch", "Ecuadorean", "Egyptian", "Equatorial Guinean", "Eritrean", "Estonian", "Ethiopian", 
+  "Fijian", "Filipino", "Finnish", "French", "Gabonese", "Gambian", "Georgian", "German", 
+  "Ghanaian", "Greek", "Grenadian", "Guatemalan", "Guinean", "Guyanese", "Haitian", 
+  "Honduran", "Hungarian", "Icelandic", "Indian", "Indonesian", "Iranian", "Iraqi", "Irish", 
+  "Israeli", "Italian", "Ivorian", "Jamaican", "Japanese", "Jordanian", "Kazakhstani", 
+  "Kenyan", "Kuwaiti", "Kyrgyz", "Laotian", "Latvian", "Lebanese", "Liberian", "Libyan", 
+  "Liechtensteiner", "Lithuanian", "Luxembourgish", "Macedonian", "Malagasy", "Malawian", 
+  "Malaysian", "Maldivian", "Malian", "Maltese", "Marshallese", "Mauritanian", "Mauritian", 
+  "Mexican", "Micronesian", "Moldovan", "Monacan", "Mongolian", "Moroccan", "Mozambican", 
+  "Namibian", "Nauruan", "Nepalese", "New Zealander", "Nicaraguan", "Nigerian", "Nigerien", 
+  "North Korean", "Norwegian", "Omani", "Pakistani", "Palauan", "Palestinian", "Panamanian", 
+  "Papua New Guinean", "Paraguayan", "Peruvian", "Polish", "Portuguese", "Qatari", 
+  "Romanian", "Russian", "Rwandan", "Saint Lucian", "Salvadoran", "Samoan", "Saudi", 
+  "Scottish", "Senegalese", "Serbian", "Seychellois", "Sierra Leonean", "Singaporean", 
+  "Slovak", "Slovenian", "Somali", "South African", "South Korean", "Spanish", "Sri Lankan", 
+  "Sudanese", "Surinamese", "Swedish", "Swiss", "Syrian", "Taiwanese", "Tajik", "Tanzanian", 
+  "Thai", "Togolese", "Tongan", "Trinidadian", "Tunisian", "Turkish", "Turkmen", "Tuvaluan", 
+  "Ugandan", "Ukrainian", "Uruguayan", "Uzbek", "Vanuatu", "Venezuelan", "Vietnamese", 
+  "Welsh", "Yemeni", "Zambian", "Zimbabwean"
 ]
-
-const AGE_OPTIONS = [
-  { value: '21-25', label: '21-25' },
-  { value: '26-30', label: '26-30' },
-  { value: '30-35', label: '30-35' },
-  { value: '35-40', label: '35-40' },
-  { value: '50+',   label: '50+' },
-]
-
-// Generate sorted array of country names from countries-list
-const NATIONALITY_OPTIONS = Object.values(countries)
-  .map(country => country.name)
-  .sort((a, b) => a.localeCompare(b))
 
 function getInitial() {
   try { 
@@ -132,22 +105,36 @@ export default function WatcherStep2() {
   }
 
   return (
-    <PageShell badge="Registration Open" desc="Register your interest for the next edition of Pitch Them Perfect. Whether you're here to take the mic or watch the magic happen, we want to hear from you." step="{2}" tagline="Think they're the one? Prove it." title="Pitch Them Perfect">
-      <BackButton to="/registration"/>
+    <PageShell
+      badge="Registration Open"
+      title="Pitch Them Perfect"
+      tagline="Think they're the one? Prove it."
+      desc="Register your interest for the next edition of Pitch Them Perfect. Whether you're here to take the mic or watch the magic happen, we want to hear from you."
+      step={2}
+    >
+      <BackButton to="/registration" />
 
       <form onSubmit={handleSubmit} noValidate style={{ display: 'contents' }}>
         <FormCard number="2" title="Audience Details">
-          <ChipGroup label="Are you?" onChange="{v" options="{GENDER_OPTIONS}" value="{form.gender}"> set('gender', v)}
+          <ChipGroup
+            label="Are you?"
+            options={GENDER_OPTIONS}
+            value={form.gender}
+            onChange={v => set('gender', v)}
             required
             error={errors.gender}
           />
 
-          <ChipGroup label="Age Category" onChange="{v" options="{AGE_OPTIONS}" value="{form.age}"> set('age', v)}
+          <ChipGroup
+            label="Age Category"
+            options={AGE_OPTIONS}
+            value={form.age}
+            onChange={v => set('age', v)}
             required
             error={errors.age}
           />
 
-          {/* Nationality Dropdown styled matching design system */}
+          {/* Nationality Dropdown */}
           <div className="form-group" style={{ marginTop: '1.75rem' }}>
             <label 
               htmlFor="nationality" 
@@ -174,7 +161,7 @@ export default function WatcherStep2() {
                 boxSizing: 'border-box',
                 fontFamily: 'inherit',
                 appearance: 'none',
-                backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)' viewBox='0 0 24 24' fill='none' stroke='%3a6b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%3a6b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'right 1.25rem center',
                 backgroundSize: '1em',
@@ -185,7 +172,7 @@ export default function WatcherStep2() {
               <option value="" disabled hidden>
                 Emiratis
               </option>
-              {NATIONALITY_OPTIONS.map(nat => (
+              {NATIONALITIES.map(nat => (
                 <option key={nat} value={nat} style={{ color: '#1a1a1a' }}>
                   {nat}
                 </option>
@@ -200,14 +187,17 @@ export default function WatcherStep2() {
           </div>
         </FormCard>
 
-        <ConsentCheckbox checked="{form.consent}" id="watcher-consent" onChange="{v"> set('consent', v)}
+        <ConsentCheckbox
+          id="watcher-consent"
+          checked={form.consent}
+          onChange={v => set('consent', v)}
           error={errors.consent}
         >
           I'm happy for Pitch Them Perfect to contact me via WhatsApp and email about this event and future editions. <span className="req">*</span>
         </ConsentCheckbox>
 
         <div className="submit-wrapper">
-          {showErrorBanner && <ErrorBanner/>}
+          {showErrorBanner && <ErrorBanner />}
           <button id="btn-proceed" type="submit" className="btn-primary">
             Proceed to Payment
           </button>
