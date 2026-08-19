@@ -38,7 +38,7 @@ export default function WatcherStep2() {
   const [showErrorBanner, setShowErrorBanner] = useState(false)
   const timeoutRef = useRef(null)
 
-  // Ambil daftar negara/kewarganegaraan otomatis
+  // Mengambil daftar negara dari library
   const countryOptions = useMemo(() => countryList().getData(), [])
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function WatcherStep2() {
     navigate('/payment/watcher')
   }
 
-  // Custom style agar dropdown pas dengan desain kamu
+  // Kustomisasi tampilan dropdown agar menyatu dengan UI form
   const customSelectStyles = {
     control: (base) => ({
       ...base,
@@ -148,7 +148,7 @@ export default function WatcherStep2() {
             error={errors.age}
           />
 
-          {/* Dropdown Kewarganegaraan */}
+          {/* Form Group Nationality / Kewarganegaraan */}
           <div className="form-group" style={{ marginTop: '1.75rem' }}>
             <label 
               htmlFor="nationality" 
