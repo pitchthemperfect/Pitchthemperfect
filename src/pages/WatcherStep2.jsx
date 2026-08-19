@@ -95,6 +95,7 @@ export default function WatcherStep2() {
             required
             error={errors.gender}
           />
+
           <ChipGroup
             label="Age Category"
             options={AGE_OPTIONS}
@@ -104,21 +105,61 @@ export default function WatcherStep2() {
             error={errors.age}
           />
 
-          {/* Nationality Field */}
-          <div className="form-group" style={{ marginTop: '1.5rem' }}>
-            <label htmlFor="nationality" className="form-label">
-              Nationality <span className="req">*</span>
+          {/* Nationality Field Styled like Reference Image */}
+          <div 
+            className="form-group" 
+            style={{ 
+              marginTop: '1.5rem', 
+              marginBottom: '1rem',
+              display: 'flex', 
+              flexDirection: 'column' 
+            }}
+          >
+            <label 
+              htmlFor="nationality" 
+              style={{
+                fontSize: '1rem',
+                fontWeight: '600',
+                color: '#1a1a1a',
+                marginBottom: '0.5rem',
+                fontFamily: 'inherit'
+              }}
+            >
+              Nationality <span style={{ color: '#1a1a1a', marginLeft: '0.2rem' }}>*</span>
             </label>
+
             <input
               id="nationality"
               type="text"
-              className={`form-input ${errors.nationality ? 'is-invalid' : ''}`}
               placeholder="e.g. Italian, Japanese, Canadian"
               value={form.nationality}
               onChange={e => set('nationality', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '1rem 1.25rem',
+                fontSize: '1rem',
+                color: '#1a1a1a',
+                backgroundColor: '#fafafa',
+                border: errors.nationality ? '1px solid #dc2626' : '1px solid #e5e7eb',
+                borderRadius: '12px',
+                outline: 'none',
+                boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.02)',
+                boxSizing: 'border-box',
+                fontFamily: 'inherit',
+                transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+              }}
             />
+
             {errors.nationality && (
-              <span className="error-text" style={{ color: 'red', fontSize: '0.875rem' }}>
+              <span 
+                className="error-text" 
+                style={{ 
+                  color: '#dc2626', 
+                  fontSize: '0.85rem', 
+                  marginTop: '0.4rem',
+                  fontWeight: '500' 
+                }}
+              >
                 {errors.nationality}
               </span>
             )}
