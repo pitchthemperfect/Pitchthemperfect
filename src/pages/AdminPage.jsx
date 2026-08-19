@@ -164,56 +164,64 @@ export default function AdminPage() {
         if (error) throw error
 
         if (dbData && dbData.length > 0) {
-          const transformed = dbData.map(r => ({
-  id: r.id,
-  name: r.name,
-  phone: r.whatsapp,
-  email: r.email,
-  role: r.role,
-  // Fields needed for stats and exports
-  pitchee_gender: r.pitchee_gender || '',
-  gender: r.gender || '',
-  age_group: r.age_group || '',
-  looking_for: r.looking_for || '',
-  media_consent: r.media_consent || false,
-  relationship_status: r.relationship_status || '',
-  nationality: r.nationality || '',
-  their_name: r.their_name || '',
-  instagram: r.instagram || '',
-  relationship: r.relationship || '',
-  can_attend: r.can_attend || '',
-  links: r.links || '',
-  // Pitcher details display
-  details: r.role === 'pitcher'
-    ? [
-        r.their_name && `Nominating: ${r.their_name}`,
-        r.pitchee_gender && `(${r.pitchee_gender})`,
-        r.relationship && `Rel: ${r.relationship}`,
-        r.relationship_status && `Status: ${r.relationship_status}`,
-        r.nationality && `Nat: ${r.nationality}`,
-        r.instagram && `IG: @${r.instagram.replace('@','')}`,
-        r.can_attend !== undefined && r.can_attend !== '' && `Both attend: ${r.can_attend}`,
-        r.links && `Links: ${r.links}`,
-      ].filter(Boolean).join(' · ')
-    : [
-        `Gender: ${r.gender || '—'}`,
-        `Age: ${r.age_group || '—'}`,
-        r.relationship_status && `Status: ${r.relationship_status}`,
-        r.nationality && `Nat: ${r.nationality}`,
-      ].filter(Boolean).join(', '),
-  pitch: r.pitch || '',
-  status: r.status,
-  attended: r.attended || false,
-  date: r.created_at ? new Date(r.created_at).toLocaleString('en-US', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  }).replace(',', '') : '-',
-  amount: r.amount
-}))
+          const transformed = dbData.map(r => {
+  // Extract values with fallbacks for alternative camelCase or payload naming
+  const relStatus = r.relationship_status || r.relationshipStatus || r.pitchee_relationship_status || '';
+  const nat = r.nationality || r.pitchee_nationality || '';
+  const inspectTheirName = r.their_name || r.theirName || '';
+  const inspectIG = r.instagram || r.pitchee_instagram || '';
+  const inspectRel = r.relationship || r.pitchee_relationship || '';
+  const inspectCanAttend = r.can_attend || r.canAttend || '';
+
+  return {
+    id: r.id,
+    name: r.name,
+    phone: r.whatsapp || r.phone || '',
+    email: r.email,
+    role: r.role,
+    pitchee_gender: r.pitchee_gender || '',
+    gender: r.gender || '',
+    age_group: r.age_group || '',
+    looking_for: r.looking_for || '',
+    media_consent: r.media_consent || false,
+    relationship_status: relStatus,
+    nationality: nat,
+    their_name: inspectTheirName,
+    instagram: inspectIG,
+    relationship: inspectRel,
+    can_attend: inspectCanAttend,
+    links: r.links || '',
+    details: r.role === 'pitcher'
+      ? [
+          inspectTheirName && `Nominating: ${inspectTheirName}`,
+          r.pitchee_gender && `(${r.pitchee_gender})`,
+          inspectRel && `Rel: ${inspectRel}`,
+          relStatus && `Status: ${relStatus}`,
+          nat && `Nat: ${nat}`,
+          inspectIG && `IG: @${inspectIG.replace('@','')}`,
+          inspectCanAttend !== undefined && inspectCanAttend !== '' && `Both attend: ${inspectCanAttend}`,
+          r.links && `Links: ${r.links}`,
+        ].filter(Boolean).join(' · ')
+      : [
+          `Gender: ${r.gender || '—'}`,
+          `Age: ${r.age_group || '—'}`,
+          relStatus && `Status: ${relStatus}`,
+          nat && `Nat: ${nat}`,
+        ].filter(Boolean).join(', '),
+    pitch: r.pitch || '',
+    status: r.status,
+    attended: r.attended || false,
+    date: r.created_at ? new Date(r.created_at).toLocaleString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }).replace(',', '') : '-',
+    amount: r.amount
+  };
+});
           setData(transformed)
         } else {
           setData([])
