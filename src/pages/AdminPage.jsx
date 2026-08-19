@@ -170,6 +170,7 @@ export default function AdminPage() {
             phone: r.whatsapp,
             email: r.email,
             role: r.role,
+            nationality: r.nationality || '',
             // Fields needed for stats
             pitchee_gender: r.pitchee_gender || '',
             gender: r.gender || '',
@@ -181,12 +182,13 @@ export default function AdminPage() {
               ? [
                   r.their_name && `Nominating: ${r.their_name}`,
                   r.pitchee_gender && `(${r.pitchee_gender})`,
+                  r.nationality && `Nat: ${r.nationality}`,
                   r.relationship && `Rel: ${r.relationship}`,
                   r.instagram && `IG: @${r.instagram.replace('@','')}`,
                   r.can_attend !== undefined && r.can_attend !== '' && `Both attend: ${r.can_attend}`,
                   r.links && `Links: ${r.links}`,
                 ].filter(Boolean).join(' · ')
-              : `Gender: ${r.gender || '—'}, Age: ${r.age_group || '—'}`,
+              : `Gender: ${r.gender || '—'}, Age: ${r.age_group || '—'}, Nat: ${r.nationality || '—'}`,
             pitch: r.pitch || '',
             status: r.status,
             attended: r.attended || false,
@@ -416,9 +418,9 @@ export default function AdminPage() {
 
   // Export to CSV helper
   const handleExport = () => {
-    const headers = 'ID,Name,Phone,Email,Role,Pitchee Gender,Their Name,Instagram,Relationship,Can Attend,Pitch,Links,Status,Attended,Date,Amount\n'
+    const headers = 'ID,Name,Phone,Email,Role,Nationality,Pitchee Gender,Their Name,Instagram,Relationship,Can Attend,Pitch,Links,Status,Attended,Date,Amount\n'
     const csvContent = filteredData.map(r => 
-      `"${r.id}","${r.name}","${r.phone}","${r.email}","${r.role}","${r.pitchee_gender||''}","${r.their_name||''}","${r.instagram||''}","${r.relationship||''}","${r.can_attend||''}","${(r.pitch||'').replace(/"/g,'""')}","${r.links||''}","${r.status}","${r.attended?'Yes':'No'}","${r.date}","${r.amount}"`
+      `"${r.id}","${r.name}","${r.phone}","${r.email}","${r.role}","${r.nationality||''}","${r.pitchee_gender||''}","${r.their_name||''}","${r.instagram||''}","${r.relationship||''}","${r.can_attend||''}","${(r.pitch||'').replace(/"/g,'""')}","${r.links||''}","${r.status}","${r.attended?'Yes':'No'}","${r.date}","${r.amount}"`
     ).join('\n')
     
     const blob = new Blob([headers + csvContent], { type: 'text/csv;charset=utf-8;' })
