@@ -165,41 +165,55 @@ export default function AdminPage() {
 
         if (dbData && dbData.length > 0) {
           const transformed = dbData.map(r => ({
-            id: r.id,
-            name: r.name,
-            phone: r.whatsapp,
-            email: r.email,
-            role: r.role,
-            // Fields needed for stats
-            pitchee_gender: r.pitchee_gender || '',
-            gender: r.gender || '',
-            age_group: r.age_group || '',
-            looking_for: r.looking_for || '',
-            media_consent: r.media_consent || false,
-            // Pitcher details display
-            details: r.role === 'pitcher'
-              ? [
-                  r.their_name && `Nominating: ${r.their_name}`,
-                  r.pitchee_gender && `(${r.pitchee_gender})`,
-                  r.relationship && `Rel: ${r.relationship}`,
-                  r.instagram && `IG: @${r.instagram.replace('@','')}`,
-                  r.can_attend !== undefined && r.can_attend !== '' && `Both attend: ${r.can_attend}`,
-                  r.links && `Links: ${r.links}`,
-                ].filter(Boolean).join(' · ')
-              : `Gender: ${r.gender || '—'}, Age: ${r.age_group || '—'}`,
-            pitch: r.pitch || '',
-            status: r.status,
-            attended: r.attended || false,
-            date: r.created_at ? new Date(r.created_at).toLocaleString('en-US', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false
-            }).replace(',', '') : '-',
-            amount: r.amount
-          }))
+  id: r.id,
+  name: r.name,
+  phone: r.whatsapp,
+  email: r.email,
+  role: r.role,
+  // Fields needed for stats and exports
+  pitchee_gender: r.pitchee_gender || '',
+  gender: r.gender || '',
+  age_group: r.age_group || '',
+  looking_for: r.looking_for || '',
+  media_consent: r.media_consent || false,
+  relationship_status: r.relationship_status || '',
+  nationality: r.nationality || '',
+  their_name: r.their_name || '',
+  instagram: r.instagram || '',
+  relationship: r.relationship || '',
+  can_attend: r.can_attend || '',
+  links: r.links || '',
+  // Pitcher details display
+  details: r.role === 'pitcher'
+    ? [
+        r.their_name && `Nominating: ${r.their_name}`,
+        r.pitchee_gender && `(${r.pitchee_gender})`,
+        r.relationship && `Rel: ${r.relationship}`,
+        r.relationship_status && `Status: ${r.relationship_status}`,
+        r.nationality && `Nat: ${r.nationality}`,
+        r.instagram && `IG: @${r.instagram.replace('@','')}`,
+        r.can_attend !== undefined && r.can_attend !== '' && `Both attend: ${r.can_attend}`,
+        r.links && `Links: ${r.links}`,
+      ].filter(Boolean).join(' · ')
+    : [
+        `Gender: ${r.gender || '—'}`,
+        `Age: ${r.age_group || '—'}`,
+        r.relationship_status && `Status: ${r.relationship_status}`,
+        r.nationality && `Nat: ${r.nationality}`,
+      ].filter(Boolean).join(', '),
+  pitch: r.pitch || '',
+  status: r.status,
+  attended: r.attended || false,
+  date: r.created_at ? new Date(r.created_at).toLocaleString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).replace(',', '') : '-',
+  amount: r.amount
+}))
           setData(transformed)
         } else {
           setData([])
