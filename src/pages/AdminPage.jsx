@@ -10,7 +10,7 @@ const INITIAL_REGISTRATIONS = [
     phone: '088885560001',
     email: 'AngeloXwidiyanto@gmail.com',
     role: 'watcher',
-    details: 'Female, 26–30, Nationality: Indonesian',
+    details: 'Female, 26–30',
     status: 'paid',
     date: '2026-07-03 21:05',
     amount: 'AED 181.00'
@@ -21,7 +21,7 @@ const INITIAL_REGISTRATIONS = [
     phone: '+971 50 123 4567',
     email: 'sarah.ahmed@example.ae',
     role: 'pitcher',
-    details: 'Nominated: Faisal, 28 (@faisal_dxb). Friend. Can attend: Yes. Nat: Emirati',
+    details: 'Nominated: Faisal, 28 (@faisal_dxb). Friend. Can attend: Yes',
     status: 'paid',
     date: '2026-07-03 20:30',
     amount: '-'
@@ -32,7 +32,7 @@ const INITIAL_REGISTRATIONS = [
     phone: '+971 52 876 5432',
     email: 'mchen@yahoo.com',
     role: 'watcher',
-    details: 'Male, 30–35, Nationality: Singaporean',
+    details: 'Male, 30–35',
     status: 'pending',
     date: '2026-07-03 19:15',
     amount: 'AED 181.00 (Pending Webhook)'
@@ -43,7 +43,7 @@ const INITIAL_REGISTRATIONS = [
     phone: '+971 54 987 6543',
     email: 'layla.m@gmail.com',
     role: 'pitcher',
-    details: 'Nominated: Humaid, 30 (@humaid_m). Colleague. Can attend: Yes. Nat: Emirati',
+    details: 'Nominated: Humaid, 30 (@humaid_m). Colleague. Can attend: Yes',
     status: 'paid',
     date: '2026-07-03 18:04',
     amount: '-'
@@ -54,7 +54,7 @@ const INITIAL_REGISTRATIONS = [
     phone: '+971 50 246 8135',
     email: 'karim.ghandour@outlook.com',
     role: 'watcher',
-    details: 'Male, 35–40, Nationality: Lebanese',
+    details: 'Male, 35–40',
     status: 'paid',
     date: '2026-07-03 15:40',
     amount: 'AED 181.00'
@@ -164,49 +164,42 @@ export default function AdminPage() {
         if (error) throw error
 
         if (dbData && dbData.length > 0) {
-          const transformed = dbData.map(r => {
-            const nationality = r.nationality || r.their_nationality || r.target_nationality || ''
-            return {
-              id: r.id,
-              name: r.name,
-              phone: r.whatsapp,
-              email: r.email,
-              role: r.role,
-              nationality: nationality,
-              pitchee_gender: r.pitchee_gender || '',
-              gender: r.gender || '',
-              age_group: r.age_group || '',
-              looking_for: r.looking_for || '',
-              media_consent: r.media_consent || false,
-              their_name: r.their_name || '',
-              instagram: r.instagram || '',
-              relationship: r.relationship || '',
-              can_attend: r.can_attend || '',
-              details: r.role === 'pitcher'
-                ? [
-                    r.their_name && `Nominating: ${r.their_name}`,
-                    r.pitchee_gender && `(${r.pitchee_gender})`,
-                    r.relationship && `Rel: ${r.relationship}`,
-                    nationality && `Nat: ${nationality}`,
-                    r.instagram && `IG: @${r.instagram.replace('@','')}`,
-                    r.can_attend !== undefined && r.can_attend !== '' && `Both attend: ${r.can_attend}`,
-                    r.links && `Links: ${r.links}`,
-                  ].filter(Boolean).join(' · ')
-                : `Gender: ${r.gender || '—'}, Age: ${r.age_group || '—'}${nationality ? `, Nat: ${nationality}` : ''}`,
-              pitch: r.pitch || '',
-              status: r.status,
-              attended: r.attended || false,
-              date: r.created_at ? new Date(r.created_at).toLocaleString('en-US', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-              }).replace(',', '') : '-',
-              amount: r.amount
-            }
-          })
+          const transformed = dbData.map(r => ({
+            id: r.id,
+            name: r.name,
+            phone: r.whatsapp,
+            email: r.email,
+            role: r.role,
+            // Fields needed for stats
+            pitchee_gender: r.pitchee_gender || '',
+            gender: r.gender || '',
+            age_group: r.age_group || '',
+            looking_for: r.looking_for || '',
+            media_consent: r.media_consent || false,
+            // Pitcher details display
+            details: r.role === 'pitcher'
+              ? [
+                  r.their_name && `Nominating: ${r.their_name}`,
+                  r.pitchee_gender && `(${r.pitchee_gender})`,
+                  r.relationship && `Rel: ${r.relationship}`,
+                  r.instagram && `IG: @${r.instagram.replace('@','')}`,
+                  r.can_attend !== undefined && r.can_attend !== '' && `Both attend: ${r.can_attend}`,
+                  r.links && `Links: ${r.links}`,
+                ].filter(Boolean).join(' · ')
+              : `Gender: ${r.gender || '—'}, Age: ${r.age_group || '—'}`,
+            pitch: r.pitch || '',
+            status: r.status,
+            attended: r.attended || false,
+            date: r.created_at ? new Date(r.created_at).toLocaleString('en-US', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false
+            }).replace(',', '') : '-',
+            amount: r.amount
+          }))
           setData(transformed)
         } else {
           setData([])
@@ -423,9 +416,9 @@ export default function AdminPage() {
 
   // Export to CSV helper
   const handleExport = () => {
-    const headers = 'ID,Name,Phone,Email,Role,Nationality,Pitchee Gender,Their Name,Instagram,Relationship,Can Attend,Pitch,Links,Status,Attended,Date,Amount\n'
+    const headers = 'ID,Name,Phone,Email,Role,Pitchee Gender,Their Name,Instagram,Relationship,Can Attend,Pitch,Links,Status,Attended,Date,Amount\n'
     const csvContent = filteredData.map(r => 
-      `"${r.id}","${r.name}","${r.phone}","${r.email}","${r.role}","${r.nationality||''}","${r.pitchee_gender||''}","${r.their_name||''}","${r.instagram||''}","${r.relationship||''}","${r.can_attend||''}","${(r.pitch||'').replace(/"/g,'""')}","${r.links||''}","${r.status}","${r.attended?'Yes':'No'}","${r.date}","${r.amount}"`
+      `"${r.id}","${r.name}","${r.phone}","${r.email}","${r.role}","${r.pitchee_gender||''}","${r.their_name||''}","${r.instagram||''}","${r.relationship||''}","${r.can_attend||''}","${(r.pitch||'').replace(/"/g,'""')}","${r.links||''}","${r.status}","${r.attended?'Yes':'No'}","${r.date}","${r.amount}"`
     ).join('\n')
     
     const blob = new Blob([headers + csvContent], { type: 'text/csv;charset=utf-8;' })
