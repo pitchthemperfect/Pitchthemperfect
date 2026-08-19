@@ -134,9 +134,9 @@ export default function WatcherStep2() {
             error={errors.age}
           />
 
-          {/* Nationality Dropdown matching section spacing and proportions */}
-          <div className="form-group" style={{ marginTop: '1.25rem' }}>
-            <div className="chip-group-label" style={{ marginBottom: '0.5rem' }}>
+          {/* Reduced margins for exact alignment */}
+          <div className="form-group" style={{ marginTop: '0.25rem' }}>
+            <div className="chip-group-label" style={{ marginBottom: '0.25rem' }}>
               Nationality <span className="req">*</span>
             </div>
 
@@ -176,7 +176,7 @@ export default function WatcherStep2() {
             </select>
 
             {errors.nationality && (
-              <span className="error-text" style={{ marginTop: '0.35rem', display: 'block' }}>
+              <span className="error-text" style={{ marginTop: '0.25rem', display: 'block' }}>
                 {errors.nationality}
               </span>
             )}
