@@ -1,8 +1,5 @@
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Select from 'react-select'
-import countryList from 'react-select-country-list'
-
 import PageShell from '../components/PageShell'
 import FormCard from '../components/FormCard'
 import ChipGroup from '../components/ChipGroup'
@@ -28,7 +25,7 @@ function getInitial() {
     const s = sessionStorage.getItem('ptp_watcher2')
     if (s) return JSON.parse(s) 
   } catch (_) {}
-  return { gender: '', age: '', nationality: null, consent: false }
+  return { gender: '', age: '', nationality: '', consent: false }
 }
 
 export default function WatcherStep2() {
@@ -37,9 +34,6 @@ export default function WatcherStep2() {
   const [errors, setErrors] = useState({})
   const [showErrorBanner, setShowErrorBanner] = useState(false)
   const timeoutRef = useRef(null)
-
-  // Mengambil daftar negara dari library
-  const countryOptions = useMemo(() => countryList().getData(), [])
 
   useEffect(() => {
     return () => {
@@ -57,10 +51,10 @@ export default function WatcherStep2() {
 
   const validate = () => {
     const e = {}
-    if (!form.gender)      e.gender      = 'Please select your gender'
-    if (!form.age)         e.age         = 'Please select your age category'
-    if (!form.nationality) e.nationality = 'Please select your nationality'
-    if (!form.consent)     e.consent     = 'Please accept to continue'
+    if (!form.gender)            e.gender      = 'Please select your gender'
+    if (!form.age)               e.age         = 'Please select your age category'
+    if (!form.nationality.trim()) e.nationality = 'Please enter your nationality'
+    if (!form.consent)           e.consent     = 'Please accept to continue'
     return e
   }
 
@@ -79,43 +73,6 @@ export default function WatcherStep2() {
     setShowErrorBanner(false)
     sessionStorage.setItem('ptp_watcher2', JSON.stringify(form))
     navigate('/payment/watcher')
-  }
-
-  // Kustomisasi tampilan dropdown agar menyatu dengan UI form
-  const customSelectStyles = {
-    control: (base) => ({
-      ...base,
-      backgroundColor: '#fbfbfb',
-      borderRadius: '14px',
-      borderColor: errors.nationality ? '#dc2626' : '#e0e0e0',
-      padding: '0.25rem 0.4rem',
-      boxShadow: 'none',
-      fontSize: '1rem',
-      fontFamily: 'inherit',
-      '&:hover': {
-        borderColor: errors.nationality ? '#dc2626' : '#cccccc'
-      }
-    }),
-    placeholder: (base) => ({
-      ...base,
-      color: '#8e8e8e'
-    }),
-    menu: (base) => ({
-      ...base,
-      borderRadius: '14px',
-      overflow: 'hidden',
-      zIndex: 10
-    }),
-    option: (base, state) => ({
-      ...base,
-      backgroundColor: state.isSelected 
-        ? '#1a1a1a' 
-        : state.isFocused 
-        ? '#f0f0f0' 
-        : 'white',
-      color: state.isSelected ? 'white' : '#1a1a1a',
-      cursor: 'pointer'
-    })
   }
 
   return (
@@ -148,30 +105,22 @@ export default function WatcherStep2() {
             error={errors.age}
           />
 
-          {/* Form Group Nationality / Kewarganegaraan */}
-          <div className="form-group" style={{ marginTop: '1.75rem' }}>
-            <label 
-              htmlFor="nationality" 
-              className="chip-group-label"
-              style={{ marginBottom: '0.6rem', display: 'block' }}
-            >
+          {/* Nationality Field styled precisely after the PitcherStep2 form visual pattern */}
+          <div className="field">
+            <label className="field-label" htmlFor="nationality">
               Nationality <span className="req">*</span>
             </label>
-
-            <Select
+            <input
               id="nationality"
-              options={countryOptions}
+              type="text"
+              autoComplete="off"
+              placeholder="e.g. Emiratis"
               value={form.nationality}
-              onChange={option => set('nationality', option)}
-              placeholder="Select nationality..."
-              styles={customSelectStyles}
-              isSearchable
+              onChange={e => set('nationality', e.target.value)}
+              className={errors.nationality ? 'has-error' : ''}
             />
-
             {errors.nationality && (
-              <span className="error-text" style={{ marginTop: '0.4rem', display: 'block' }}>
-                {errors.nationality}
-              </span>
+              <span className="field-error">{errors.nationality}</span>
             )}
           </div>
         </FormCard>
