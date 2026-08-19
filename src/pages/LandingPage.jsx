@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../utils/supabaseClient'
 import { trackLead } from '../lib/tracking'
 
-/* --- Custom SVG Icons to Match Your Minimalist Style --- */
 const HeartIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'block' }}>
     <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
@@ -18,20 +17,25 @@ const CalendarIcon = () => (
 
 const MapPinIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="12" r="3" />
+    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" />
   </svg>
 )
 
-// NEW minimal chevron icons to match reference
-const ChevronDown = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="6 9 12 15 18 9"></polyline>
+const MicIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v1a7 7 0 0 1-14 0v-1" /><line x1="12" x2="12" y1="19" y2="22" />
   </svg>
 )
 
-const ChevronUp = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="18 15 12 9 6 15"></polyline>
+const EyeIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" />
+  </svg>
+)
+
+const SparkleIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2c0 5.523-4.477 10-10 10 5.523 0 10 4.477 10 10 0-5.523 4.477-10 10-10-5.523 0-10-4.477-10-10z" />
   </svg>
 )
 
@@ -41,9 +45,6 @@ export default function LandingPage() {
   const [eventTime, setEventTime] = useState('')
   const [eventLocation, setEventLocation] = useState('')
   const [gallery, setGallery] = useState({ g1: '', g2: '', g3: '', g4: '' })
-  
-  // State to track which FAQ is expanded, initialized to null (all closed)
-  const [openFaqIndex, setOpenFaqIndex] = useState(null);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -75,35 +76,6 @@ export default function LandingPage() {
     navigate('/registration')
   }
 
-  // Define FAQ data here for easier maintenance
-  const faqData = [
-    {
-      question: "Do I need to come with a friend?",
-      answer: "Not at all! Most people come solo — and honestly, it makes meeting new people even easier. If it’s a Pitch Night, don’t worry — we’ll make sure you’re not the only one flying solo."
-    },
-    {
-      question: "What if I registered and suddenly can't make it?",
-      answer: (
-        <>
-          <p>No worries! We offer refunds based on when you cancel:</p>
-          <ul>
-            <li><strong>More than 24 hours before the event:</strong> Full refund, minus the bank processing fee.</li>
-            <li><strong>Between 24 and 5 hours before the event:</strong> 60% refund, minus the bank processing fee.</li>
-            <li><strong>Less than 5 hours before the event:</strong> No refund.</li>
-          </ul>
-        </>
-      )
-    },
-    {
-      question: "Is it only for singles?",
-      answer: "Mostly, but not exclusively! Singles are definitely welcome, but couples can join too — whether you’re looking for a fun night out or coming along to pitch your single friend."
-    },
-    {
-      question: "What should I prepare?",
-      answer: "Just bring yourself, an open mind, and your best energy. Come ready for a fun night, good conversations, and maybe a little unexpected chemistry. 😉"
-    }
-  ];
-
   return (
     <div className="landing-page">
       <div className="landing-inner">
@@ -128,6 +100,7 @@ export default function LandingPage() {
             No algorithms. No swiping. Just real human chemistry.
           </p>
 
+          {/* Event info moved here — above CTAs */}
           <div className="landing-hero-event-info">
             <span className="hero-event-date">
               <CalendarIcon /> {eventDate || 'Date TBA'}
@@ -136,6 +109,7 @@ export default function LandingPage() {
             {eventLocation && <span><span className="hero-event-divider">·</span><MapPinIcon /> {eventLocation}</span>}
           </div>
 
+          {/* CTAs */}
           <div className="landing-hero-ctas">
             <button className="landing-cta-primary" onClick={() => goToRegister('pitcher')}>
               Reserve Your Spot
@@ -153,45 +127,54 @@ export default function LandingPage() {
           <h2 className="landing-section-title">What to expect on the night</h2>
 
           <div className="landing-gallery-grid">
-            {/* Gallery items... (unchanged, but added placeholder for brevity) */}
             <div className={`landing-gallery-card gallery-card-main${gallery.g1 ? ' has-photo' : ''}`}>
-               <div className="gallery-card-inner">
-                 {gallery.g1 ? <img src={gallery.g1} alt="Live pitch" className="gallery-photo" /> : <span className="gallery-emoji">🎤</span>}
-               </div>
-            </div>
-            {/* Repeat for g2, g3, g4 as needed */}
-          </div>
-        </section>
-
-        {/* ─── FAQ Section ─── */}
-        <section className="landing-faq-section">
-          <p className="landing-section-eyebrow">Got Questions?</p>
-          <h2 className="landing-section-title">Frequently Asked Questions</h2>
-
-          <div className="landing-faq-list">
-            {faqData.map((faq, index) => (
-              <div 
-                key={index} 
-                className={`landing-faq-item ${openFaqIndex === index ? 'is-open' : ''}`}
-              >
-                <button 
-                  className="landing-faq-question" 
-                  onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)} // Toggle open/closed state
-                >
-                  <span>{faq.question}</span>
-                  <span className="faq-toggle-icon">
-                    {openFaqIndex === index ? <ChevronUp /> : <ChevronDown />}
-                  </span>
-                </button>
-                {/* Conditionally render the answer to minimize visual clutter */}
-                {openFaqIndex === index && (
-                  <div className="landing-faq-answer">
-                    {/* Ensure answer font size is slightly smaller than question and has space */}
-                    {typeof faq.answer === 'string' ? <p style={{ fontSize: '0.95rem', marginTop: '0.5rem' }}>{faq.answer}</p> : faq.answer}
-                  </div>
+              <div className="gallery-card-inner">
+                {gallery.g1 ? (
+                  <img src={gallery.g1} alt="Live pitch on stage" className="gallery-photo" />
+                ) : (
+                  <>
+                    <span className="gallery-emoji">🎤</span>
+                    <p className="gallery-label">Live Pitches</p>
+                  </>
                 )}
               </div>
-            ))}
+            </div>
+            <div className={`landing-gallery-card${gallery.g2 ? ' has-photo' : ''}`}>
+              <div className="gallery-card-inner">
+                {gallery.g2 ? (
+                  <img src={gallery.g2} alt="Drinks and social" className="gallery-photo" />
+                ) : (
+                  <>
+                    <span className="gallery-emoji">🥂</span>
+                    <p className="gallery-label">Drinks & Social</p>
+                  </>
+                )}
+              </div>
+            </div>
+            <div className={`landing-gallery-card${gallery.g3 ? ' has-photo' : ''}`}>
+              <div className="gallery-card-inner">
+                {gallery.g3 ? (
+                  <img src={gallery.g3} alt="Real connections" className="gallery-photo" />
+                ) : (
+                  <>
+                    <span className="gallery-emoji">💫</span>
+                    <p className="gallery-label">Real Matches</p>
+                  </>
+                )}
+              </div>
+            </div>
+            <div className={`landing-gallery-card gallery-card-wide${gallery.g4 ? ' has-photo' : ''}`}>
+              <div className="gallery-card-inner">
+                {gallery.g4 ? (
+                  <img src={gallery.g4} alt="Curated crowd" className="gallery-photo" />
+                ) : (
+                  <>
+                    <span className="gallery-emoji">✨</span>
+                    <p className="gallery-label">Curated Crowd</p>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </section>
 
@@ -207,4 +190,4 @@ export default function LandingPage() {
       </div>
     </div>
   )
-}
+} 
