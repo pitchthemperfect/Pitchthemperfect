@@ -105,9 +105,9 @@ export default function WatcherStep2() {
             error={errors.age}
           />
 
-          {/* Native form element using your project's stylesheet */}
+          {/* Nationality Field matching ChipGroup typography & spacing */}
           <div className="form-group">
-            <label htmlFor="nationality" className="form-label">
+            <label htmlFor="nationality" className="chip-group-label">
               Nationality <span className="req">*</span>
             </label>
 
@@ -115,9 +115,22 @@ export default function WatcherStep2() {
               id="nationality"
               type="text"
               className={`form-input ${errors.nationality ? 'is-invalid' : ''}`}
-              placeholder="e.g. Emiratis"
+              placeholder="Emiratis"
               value={form.nationality}
               onChange={e => set('nationality', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '1rem 1.25rem',
+                fontSize: '1rem',
+                color: '#1a1a1a',
+                backgroundColor: '#f9f9f9',
+                border: errors.nationality ? '1px solid #dc2626' : '1px solid #e5e7eb',
+                borderRadius: '16px',
+                outline: 'none',
+                boxSizing: 'border-box',
+                fontFamily: 'inherit',
+                transition: 'border-color 0.2s ease'
+              }}
             />
 
             {errors.nationality && (
