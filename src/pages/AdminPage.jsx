@@ -2,6 +2,65 @@ import { useState, useMemo, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../utils/supabaseClient'
 
+// Seed mock data for the admin page
+const INITIAL_REGISTRATIONS = [
+  {
+    id: 1,
+    name: 'Angelo Widiyanto',
+    phone: '088885560001',
+    email: 'AngeloXwidiyanto@gmail.com',
+    role: 'watcher',
+    details: 'Female, 26–30',
+    status: 'paid',
+    date: '2026-07-03 21:05',
+    amount: 'AED 181.00'
+  },
+  {
+    id: 2,
+    name: 'Sarah Ahmed',
+    phone: '+971 50 123 4567',
+    email: 'sarah.ahmed@example.ae',
+    role: 'pitcher',
+    details: 'Nominated: Faisal, 28 (@faisal_dxb). Friend. Can attend: Yes',
+    status: 'paid',
+    date: '2026-07-03 20:30',
+    amount: '-'
+  },
+  {
+    id: 3,
+    name: 'Michael Chen',
+    phone: '+971 52 876 5432',
+    email: 'mchen@yahoo.com',
+    role: 'watcher',
+    details: 'Male, 30–35',
+    status: 'pending',
+    date: '2026-07-03 19:15',
+    amount: 'AED 181.00 (Pending Webhook)'
+  },
+  {
+    id: 4,
+    name: 'Layla Al-Mansoori',
+    phone: '+971 54 987 6543',
+    email: 'layla.m@gmail.com',
+    role: 'pitcher',
+    details: 'Nominated: Humaid, 30 (@humaid_m). Colleague. Can attend: Yes',
+    status: 'paid',
+    date: '2026-07-03 18:04',
+    amount: '-'
+  },
+  {
+    id: 5,
+    name: 'Karim Ghandour',
+    phone: '+971 50 246 8135',
+    email: 'karim.ghandour@outlook.com',
+    role: 'watcher',
+    details: 'Male, 35–40',
+    status: 'paid',
+    date: '2026-07-03 15:40',
+    amount: 'AED 181.00'
+  }
+]
+
 export default function AdminPage() {
   const navigate = useNavigate()
   
@@ -111,30 +170,23 @@ export default function AdminPage() {
             phone: r.whatsapp,
             email: r.email,
             role: r.role,
-            nationality: r.nationality || '',
-            their_name: r.their_name || '',
-            instagram: r.instagram || '',
-            relationship: r.relationship || '',
-            can_attend: r.can_attend !== undefined ? String(r.can_attend) : '',
-            links: r.links || '',
             // Fields needed for stats
             pitchee_gender: r.pitchee_gender || '',
             gender: r.gender || '',
             age_group: r.age_group || '',
             looking_for: r.looking_for || '',
             media_consent: r.media_consent || false,
-            // Pitcher & Watcher details display
+            // Pitcher details display
             details: r.role === 'pitcher'
               ? [
                   r.their_name && `Nominating: ${r.their_name}`,
                   r.pitchee_gender && `(${r.pitchee_gender})`,
-                  r.nationality && `Nat: ${r.nationality}`,
                   r.relationship && `Rel: ${r.relationship}`,
                   r.instagram && `IG: @${r.instagram.replace('@','')}`,
                   r.can_attend !== undefined && r.can_attend !== '' && `Both attend: ${r.can_attend}`,
                   r.links && `Links: ${r.links}`,
                 ].filter(Boolean).join(' · ')
-              : `Gender: ${r.gender || '—'}, Age: ${r.age_group || '—'}, Nat: ${r.nationality || '—'}`,
+              : `Gender: ${r.gender || '—'}, Age: ${r.age_group || '—'}`,
             pitch: r.pitch || '',
             status: r.status,
             attended: r.attended || false,
@@ -218,6 +270,7 @@ export default function AdminPage() {
     fetchPrices()
     fetchEventCaps()
 
+    // Store so refresh can call them
     fetchersRef.current = { fetchRegistrations, fetchPrices, fetchEventCaps }
   }, [isAuthenticated, eventFilter])
 
@@ -227,34 +280,42 @@ export default function AdminPage() {
       setIsSavingPrices(true)
       setPricingSaveMessage('')
       
+      // Update watcher price
       const { error: wError } = await supabase
         .from('settings')
         .upsert({ key: 'watcher_price', value: watcherPriceInput }, { onConflict: 'key' })
         
+      // Update pitcher price
       const { error: pError } = await supabase
         .from('settings')
         .upsert({ key: 'pitcher_price', value: pitcherPriceInput }, { onConflict: 'key' })
 
+      // Update watcher URL
       const { error: wUrlError } = await supabase
         .from('settings')
         .upsert({ key: 'watcher_payment_url', value: watcherUrlInput }, { onConflict: 'key' })
         
+      // Update pitcher URL
       const { error: pUrlError } = await supabase
         .from('settings')
         .upsert({ key: 'pitcher_payment_url', value: pitcherUrlInput }, { onConflict: 'key' })
 
+      // Update event date
       const { error: dateError } = await supabase
         .from('settings')
         .upsert({ key: 'event_date', value: eventDateInput }, { onConflict: 'key' })
 
+      // Update event time
       const { error: timeError } = await supabase
         .from('settings')
         .upsert({ key: 'event_time', value: eventTimeInput }, { onConflict: 'key' })
 
+      // Update event location
       const { error: locError } = await supabase
         .from('settings')
         .upsert({ key: 'event_location', value: eventLocationInput }, { onConflict: 'key' })
 
+      // Update gallery photos
       const { error: g1Error } = await supabase
         .from('settings')
         .upsert({ key: 'gallery_photo_1', value: gallery1Input }, { onConflict: 'key' })
@@ -290,6 +351,7 @@ export default function AdminPage() {
       setPricingSaveMessage('✓ Settings saved!')
       setTimeout(() => setPricingSaveMessage(''), 3000)
 
+      // Save capacity caps to active event
       const { data: events } = await supabase
         .from('events')
         .select('id')
@@ -305,6 +367,7 @@ export default function AdminPage() {
           })
           .eq('id', events[0].id)
       } else {
+        // No active event — create one
         await supabase
           .from('events')
           .insert({
@@ -353,9 +416,9 @@ export default function AdminPage() {
 
   // Export to CSV helper
   const handleExport = () => {
-    const headers = 'ID,Name,Phone,Email,Role,Nationality,Pitchee Gender,Their Name,Instagram,Relationship,Can Attend,Pitch,Links,Status,Attended,Date,Amount\n'
+    const headers = 'ID,Name,Phone,Email,Role,Pitchee Gender,Their Name,Instagram,Relationship,Can Attend,Pitch,Links,Status,Attended,Date,Amount\n'
     const csvContent = filteredData.map(r => 
-      `"${r.id}","${r.name}","${r.phone}","${r.email}","${r.role}","${r.nationality||''}","${r.pitchee_gender||''}","${r.their_name||''}","${r.instagram||''}","${r.relationship||''}","${r.can_attend||''}","${(r.pitch||'').replace(/"/g,'""')}","${r.links||''}","${r.status}","${r.attended?'Yes':'No'}","${r.date}","${r.amount}"`
+      `"${r.id}","${r.name}","${r.phone}","${r.email}","${r.role}","${r.pitchee_gender||''}","${r.their_name||''}","${r.instagram||''}","${r.relationship||''}","${r.can_attend||''}","${(r.pitch||'').replace(/"/g,'""')}","${r.links||''}","${r.status}","${r.attended?'Yes':'No'}","${r.date}","${r.amount}"`
     ).join('\n')
     
     const blob = new Blob([headers + csvContent], { type: 'text/csv;charset=utf-8;' })
@@ -370,29 +433,35 @@ export default function AdminPage() {
   }
 
   const handleUpdateStatus = async (id, newStatus) => {
+    console.log('[Admin] updateStatus — id:', id, 'newStatus:', newStatus)
     const { data: updated, error } = await supabase
       .from('registrations')
       .update({ status: newStatus })
       .eq('id', id)
       .select('id, status')
     if (error) {
+      console.error('[Admin] Status update FAILED:', JSON.stringify(error))
       alert(`❌ Status update failed:\n${error.message || JSON.stringify(error)}`)
       return
     }
+    console.log('[Admin] Status updated OK:', updated)
     setData(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r))
   }
 
   const handleToggleAttended = async (id, current) => {
     const newVal = !current
+    console.log('[Admin] toggleAttended — id:', id, 'newVal:', newVal)
     const { data: updated, error } = await supabase
       .from('registrations')
       .update({ attended: newVal })
       .eq('id', id)
       .select('id, attended')
     if (error) {
+      console.error('[Admin] Attended update FAILED:', JSON.stringify(error))
       alert(`❌ Attended update failed:\n${error.message || JSON.stringify(error)}`)
       return
     }
+    console.log('[Admin] Attended updated OK:', updated)
     setData(prev => prev.map(r => r.id === id ? { ...r, attended: newVal } : r))
   }
 
@@ -407,31 +476,38 @@ export default function AdminPage() {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this registration permanently?')) return
+    console.log('[Admin] delete — id:', id)
     const { error } = await supabase.from('registrations').delete().eq('id', id)
     if (error) {
+      console.error('[Admin] Delete FAILED:', JSON.stringify(error))
       alert(`❌ Delete failed:\n${error.message || JSON.stringify(error)}`)
       return
     }
+    console.log('[Admin] Deleted OK')
     setData(prev => prev.filter(r => r.id !== id))
   }
 
   const handleConfirmPayment = async (row) => {
     if (!window.confirm(`Confirm payment for ${row.name}? This will send the confirmation email.`)) return
     const newStatus = 'paid'
+    console.log('[Admin] confirmPayment — id:', row.id, 'name:', row.name)
     const { data: updated, error } = await supabase
       .from('registrations')
       .update({ status: newStatus })
       .eq('id', row.id)
       .select('id, status')
     if (error) {
+      console.error('[Admin] Confirm FAILED:', JSON.stringify(error))
       alert(`❌ Confirm failed:\n${error.message || JSON.stringify(error)}`)
       return
     }
+    console.log('[Admin] Confirm OK — returned rows:', updated)
     if (!updated || updated.length === 0) {
       alert(`⚠️ Update sent but Supabase returned 0 rows changed.\nPossible RLS block or wrong ID match.\nCheck Supabase Dashboard → Table Editor → registrations`)
       return
     }
     setData(prev => prev.map(r => r.id === row.id ? { ...r, status: newStatus } : r))
+    // Trigger confirmation email
     try {
       await fetch('https://tnohztvpuflwkltkbphg.supabase.co/functions/v1/send-confirmation', {
         method: 'POST',
@@ -443,7 +519,9 @@ export default function AdminPage() {
 
   const handleNewEvent = async () => {
     if (!window.confirm('Start a new event? This will archive the current event and reset all capacity counters. Old data is preserved.')) return
+    // Deactivate current
     await supabase.from('events').update({ is_active: false }).eq('is_active', true)
+    // Create new with same caps
     await supabase.from('events').insert({
       show_date: new Date().toISOString().split('T')[0],
       cap_pitcher_male: parseInt(capPitcherMaleInput) || 5,
@@ -451,6 +529,7 @@ export default function AdminPage() {
       cap_watcher: parseInt(capWatcherInput) || 60,
       is_active: true,
     })
+    // Clear event cache so next fetch gets the new one
     import('../lib/event').then(m => m.clearEventCache())
     handleRefresh()
   }
@@ -767,6 +846,7 @@ export default function AdminPage() {
               }}
               onClick={e => e.stopPropagation()}
             >
+              {/* Close Button */}
               <button 
                 onClick={() => setIsSettingsOpen(false)}
                 style={{
@@ -1224,13 +1304,13 @@ export default function AdminPage() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="6" style={{ padding: '48px 20px', textAlign: 'center', color: '#888' }}>
+                    <td colSpan="7" style={{ padding: '48px 20px', textAlign: 'center', color: '#888' }}>
                       <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite', marginRight: 8 }}>⏳</span> Loading registrations...
                     </td>
                   </tr>
                 ) : filteredData.length === 0 ? (
                   <tr>
-                    <td colSpan="6" style={{ padding: '48px 20px', textAlign: 'center' }}>
+                    <td colSpan="7" style={{ padding: '48px 20px', textAlign: 'center' }}>
                       <div style={{ color: '#CCC', fontSize: 48, marginBottom: 12 }}>📭</div>
                       <div style={{ color: '#888', fontWeight: 600, fontSize: 14 }}>No registrations found</div>
                     </td>
@@ -1284,8 +1364,10 @@ export default function AdminPage() {
                               row.status === 'declined'  ? '#C62828' : '#555',
                             width: '100%', maxWidth: 120
                           }}>
+                          {/* Common statuses */}
                           <option value="pending">⏳ Pending</option>
                           <option value="paid">💳 Paid</option>
+                          {/* Pitcher-only: confirmed after pitch review */}
                           {row.role === 'pitcher' && (
                             <option value="confirmed">✅ Confirmed</option>
                           )}
@@ -1294,6 +1376,7 @@ export default function AdminPage() {
                         </select>
                       </td>
                       <td style={{ padding: '20px 20px', whiteSpace: 'nowrap' }}>
+                        {/* Confirm payment */}
                         {row.status === 'pending' && (
                           <button onClick={() => handleConfirmPayment(row)}
                             style={{
@@ -1302,11 +1385,15 @@ export default function AdminPage() {
                               cursor: 'pointer', fontFamily: 'inherit', marginRight: 6
                             }}>💳 Confirm</button>
                         )}
-                        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer', fontSize: 11, color: row.attended ? '#2E7D32' : '#AAA', marginRight: 8 }}>
+                        {/* Attended check */}
+                        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer', fontSize: 11, color: row.attended ? '#2E7D32' : '#AAA' }}>
                           <input type="checkbox" checked={row.attended || false} onChange={() => handleToggleAttended(row.id, row.attended)}
                             style={{ cursor: 'pointer', accentColor: '#E8386D' }} />
                           Attended
                         </label>
+                      </td>
+                      <td style={{ padding: '20px 20px' }}>
+                        {/* Actions: delete */}
                         <button onClick={() => handleDelete(row.id)}
                           style={{
                             padding: '6px 12px', borderRadius: 6, border: '1px solid #EAECEF',
@@ -1326,6 +1413,7 @@ export default function AdminPage() {
         {/* ─── Tab: Analytics ─── */}
         {activeTab === 'analytics' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }} onClick={() => fetchPixelStats()}>
+            {/* Stats Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
               {[
                 { label: 'Total Paid', val: stats.totalPaid, icon: '💳', sub: `${stats.pitchersConfirmed} pitcher + ${stats.paidWatchers} watcher` },
@@ -1371,6 +1459,7 @@ export default function AdminPage() {
 
             {emailSaveMsg && <div style={{ padding: '10px 14px', borderRadius: 8, background: '#E8F5E9', color: '#2E7D32', fontWeight: 700, fontSize: 13, marginBottom: 20 }}>{emailSaveMsg}</div>}
 
+            {/* Templates */}
             {[
               { key: 'confirmation_pitcher', label: '🎤 Confirmation — Pitcher', subj: emailPitcherSubject, setSubj: setEmailPitcherSubject, body: emailPitcherBody, setBody: setEmailPitcherBody },
               { key: 'confirmation_watcher', label: '👁 Confirmation — Watcher', subj: emailWatcherSubject, setSubj: setEmailWatcherSubject, body: emailWatcherBody, setBody: setEmailWatcherBody },
