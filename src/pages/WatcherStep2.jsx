@@ -21,8 +21,11 @@ const AGE_OPTIONS = [
 ]
 
 function getInitial() {
-  try { const s = sessionStorage.getItem('ptp_watcher2'); if (s) return JSON.parse(s) } catch (_) {}
-  return { gender: '', age: '', consent: false }
+  try { 
+    const s = sessionStorage.getItem('ptp_watcher2')
+    if (s) return JSON.parse(s) 
+  } catch (_) {}
+  return { gender: '', age: '', nationality: '', consent: false }
 }
 
 export default function WatcherStep2() {
@@ -48,9 +51,10 @@ export default function WatcherStep2() {
 
   const validate = () => {
     const e = {}
-    if (!form.gender)  e.gender  = 'Please select your gender'
-    if (!form.age)     e.age     = 'Please select your age category'
-    if (!form.consent) e.consent = 'Please accept to continue'
+    if (!form.gender)            e.gender      = 'Please select your gender'
+    if (!form.age)               e.age         = 'Please select your age category'
+    if (!form.nationality.trim()) e.nationality = 'Please enter your nationality'
+    if (!form.consent)           e.consent     = 'Please accept to continue'
     return e
   }
 
@@ -99,6 +103,26 @@ export default function WatcherStep2() {
             required
             error={errors.age}
           />
+
+          {/* Nationality Field */}
+          <div className="form-group" style={{ marginTop: '1.5rem' }}>
+            <label htmlFor="nationality" className="form-label">
+              Nationality <span className="req">*</span>
+            </label>
+            <input
+              id="nationality"
+              type="text"
+              className={`form-input ${errors.nationality ? 'is-invalid' : ''}`}
+              placeholder="e.g. Italian, Japanese, Canadian"
+              value={form.nationality}
+              onChange={e => set('nationality', e.target.value)}
+            />
+            {errors.nationality && (
+              <span className="error-text" style={{ color: 'red', fontSize: '0.875rem' }}>
+                {errors.nationality}
+              </span>
+            )}
+          </div>
         </FormCard>
 
         <ConsentCheckbox
