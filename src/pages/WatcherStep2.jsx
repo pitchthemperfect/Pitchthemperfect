@@ -134,12 +134,18 @@ export default function WatcherStep2() {
             error={errors.age}
           />
 
-          {/* Nationality Dropdown */}
-          <div className="form-group" style={{ marginTop: '1.75rem' }}>
+          {/* Nationality Dropdown - Exactly matched to ChipGroup spacing and size */}
+          <div className="form-group" style={{ marginTop: '1.25rem' }}>
             <label 
               htmlFor="nationality" 
               className="chip-group-label"
-              style={{ marginBottom: '0.6rem', display: 'block' }}
+              style={{ 
+                marginBottom: '0.5rem', 
+                display: 'block',
+                fontWeight: '600',
+                fontSize: '0.95rem',
+                color: '#1a1a1a'
+              }}
             >
               Nationality <span className="req">*</span>
             </label>
@@ -151,17 +157,18 @@ export default function WatcherStep2() {
               className={`form-input ${errors.nationality ? 'is-invalid' : ''}`}
               style={{
                 width: '100%',
-                padding: '0.875rem 1.25rem',
-                fontSize: '1rem',
+                padding: '0.75rem 1.25rem',
+                fontSize: '0.95rem',
+                fontWeight: '400',
                 color: form.nationality ? '#1a1a1a' : '#9ca3af',
                 backgroundColor: '#fbfbfb',
-                border: errors.nationality ? '1px solid #dc2626' : '1px solid #e0e0e0',
-                borderRadius: '14px',
+                border: errors.nationality ? '1px solid #dc2626' : '1px solid #e2e8f0',
+                borderRadius: '16px',
                 outline: 'none',
                 boxSizing: 'border-box',
                 fontFamily: 'inherit',
                 appearance: 'none',
-                backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%3a6b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%3a9ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'right 1.25rem center',
                 backgroundSize: '1em',
@@ -180,7 +187,7 @@ export default function WatcherStep2() {
             </select>
 
             {errors.nationality && (
-              <span className="error-text" style={{ marginTop: '0.4rem', display: 'block' }}>
+              <span className="error-text" style={{ marginTop: '0.35rem', display: 'block', fontSize: '0.85rem' }}>
                 {errors.nationality}
               </span>
             )}
