@@ -28,7 +28,7 @@ const GENDER_OPTIONS = [
 
 function getInitial() {
   try { const s = sessionStorage.getItem('ptp_pitcher2'); if (s) return JSON.parse(s) } catch (_) {}
-  return { theirName: '', instagram: '', pitcheeGender: '', relationship: '', canAttend: '', pitch: '', links: '', consent: false }
+  return { theirName: '', instagram: '', nationality: '', pitcheeGender: '', relationship: '', canAttend: '', pitch: '', links: '', consent: false }
 }
 
 export default function PitcherStep2() {
@@ -61,13 +61,14 @@ export default function PitcherStep2() {
 
   const validate = () => {
     const e = {}
-    if (!form.theirName.trim()) e.theirName    = 'Please enter their name and age'
-    if (!form.instagram.trim()) e.instagram    = 'Please enter their Instagram handle'
-    if (!form.relationship)     e.relationship = 'Please select your relationship'
-    if (!form.pitcheeGender)    e.pitcheeGender = 'Please select their gender'
-    if (!form.canAttend)        e.canAttend    = 'Please answer this'
-    if (!form.pitch.trim())     e.pitch        = 'Please write your pitch'
-    if (!form.consent)          e.consent      = 'Please accept to continue'
+    if (!form.theirName.trim())   e.theirName     = 'Please enter their name and age'
+    if (!form.instagram.trim())   e.instagram     = 'Please enter their Instagram handle'
+    if (!form.nationality.trim()) e.nationality   = 'Please enter their nationality'
+    if (!form.relationship)       e.relationship  = 'Please select your relationship'
+    if (!form.pitcheeGender)      e.pitcheeGender = 'Please select their gender'
+    if (!form.canAttend)          e.canAttend     = 'Please answer this'
+    if (!form.pitch.trim())       e.pitch         = 'Please write your pitch'
+    if (!form.consent)            e.consent       = 'Please accept to continue'
     return e
   }
 
@@ -115,6 +116,14 @@ export default function PitcherStep2() {
               value={form.instagram} onChange={e => set('instagram', e.target.value)}
               className={errors.instagram ? 'has-error' : ''} />
             {errors.instagram && <span className="field-error">{errors.instagram}</span>}
+          </div>
+
+          <div className="field">
+            <label className="field-label" htmlFor="nationality">Their Nationality <span className="req">*</span></label>
+            <input id="nationality" type="text" autoComplete="off" placeholder="e.g. Emiratis"
+              value={form.nationality} onChange={e => set('nationality', e.target.value)}
+              className={errors.nationality ? 'has-error' : ''} />
+            {errors.nationality && <span className="field-error">{errors.nationality}</span>}
           </div>
 
           <ChipGroup
