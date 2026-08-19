@@ -105,60 +105,23 @@ export default function WatcherStep2() {
             error={errors.age}
           />
 
-          {/* Nationality Field - Matched Font & Spacing */}
-          <div 
-            className="form-group" 
-            style={{ 
-              marginTop: '1.25rem', 
-              display: 'flex', 
-              flexDirection: 'column' 
-            }}
-          >
-            <label 
-              htmlFor="nationality" 
-              className="form-label"
-              style={{
-                fontSize: '0.9375rem',
-                fontWeight: '600',
-                color: '#1a1a1a',
-                marginBottom: '0.5rem',
-                fontFamily: 'inherit'
-              }}
-            >
+          {/* Native form element using your project's stylesheet */}
+          <div className="form-group">
+            <label htmlFor="nationality" className="form-label">
               Nationality <span className="req">*</span>
             </label>
 
             <input
               id="nationality"
               type="text"
+              className={`form-input ${errors.nationality ? 'is-invalid' : ''}`}
               placeholder="e.g. Italian, Japanese, Canadian"
               value={form.nationality}
               onChange={e => set('nationality', e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.875rem 1.25rem',
-                fontSize: '0.9375rem',
-                color: '#1a1a1a',
-                backgroundColor: '#f8f9fa',
-                border: errors.nationality ? '1px solid #dc2626' : '1px solid #e2e8f0',
-                borderRadius: '16px',
-                outline: 'none',
-                boxSizing: 'border-box',
-                fontFamily: 'inherit',
-                transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
-              }}
             />
 
             {errors.nationality && (
-              <span 
-                className="error-text" 
-                style={{ 
-                  color: '#dc2626', 
-                  fontSize: '0.85rem', 
-                  marginTop: '0.35rem',
-                  fontWeight: '500' 
-                }}
-              >
+              <span className="error-text">
                 {errors.nationality}
               </span>
             )}
