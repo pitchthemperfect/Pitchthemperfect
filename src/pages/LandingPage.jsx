@@ -21,23 +21,53 @@ const MapPinIcon = () => (
   </svg>
 )
 
-const MicIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v1a7 7 0 0 1-14 0v-1" /><line x1="12" x2="12" y1="19" y2="22" />
+const ChevronIcon = ({ isOpen }) => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    style={{
+      transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+      transition: 'transform 0.25s ease',
+      flexShrink: 0
+    }}
+  >
+    <polyline points="6 9 12 15 18 9" />
   </svg>
 )
 
-const EyeIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" />
-  </svg>
-)
-
-const SparkleIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 2c0 5.523-4.477 10-10 10 5.523 0 10 4.477 10 10 0-5.523 4.477-10 10-10-5.523 0-10-4.477-10-10z" />
-  </svg>
-)
+const FAQ_ITEMS = [
+  {
+    q: 'Do I need to come with a friend?',
+    a: "Not at all! Most people come solo — and honestly, it makes meeting new people even easier. If it's a Pitch Night, don't worry — we'll make sure you're not the only one flying solo."
+  },
+  {
+    q: "What if I register and suddenly can't make it?",
+    a: (
+      <>
+        No worries! We offer refunds based on when you cancel:
+        <ul style={{ margin: '8px 0 0 0', paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <li><strong>More than 24 hours before the event:</strong> Full refund, minus the bank processing fee.</li>
+          <li><strong>Between 24 and 5 hours before the event:</strong> 60% refund, minus the bank processing fee.</li>
+          <li><strong>Less than 5 hours before the event:</strong> No refund.</li>
+        </ul>
+      </>
+    )
+  },
+  {
+    q: 'Is it only for singles?',
+    a: "Mostly, but not exclusively! Singles are definitely welcome, but couples can join too — whether you're looking for a fun night out or coming along to pitch your single friend."
+  },
+  {
+    q: 'What should I prepare?',
+    a: 'Just bring yourself, an open mind, and your best energy. Come ready for a fun night, good conversations, and maybe a little unexpected chemistry. 😉'
+  }
+]
 
 export default function LandingPage() {
   const navigate = useNavigate()
@@ -45,6 +75,7 @@ export default function LandingPage() {
   const [eventTime, setEventTime] = useState('')
   const [eventLocation, setEventLocation] = useState('')
   const [gallery, setGallery] = useState({ g1: '', g2: '', g3: '', g4: '' })
+  const [openFaq, setOpenFaq] = useState(null)
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -76,6 +107,10 @@ export default function LandingPage() {
     navigate('/registration')
   }
 
+  const toggleFaq = (idx) => {
+    setOpenFaq(openFaq === idx ? null : idx)
+  }
+
   return (
     <div className="landing-page">
       <div className="landing-inner">
@@ -100,7 +135,7 @@ export default function LandingPage() {
             No algorithms. No swiping. Just real human chemistry.
           </p>
 
-          {/* Event info moved here — above CTAs */}
+          {/* Event info */}
           <div className="landing-hero-event-info">
             <span className="hero-event-date">
               <CalendarIcon /> {eventDate || 'Date TBA'}
@@ -178,6 +213,70 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* ─── FAQ Section ─── */}
+        <section className="landing-faq-section" style={{ marginTop: '3.5rem', marginBottom: '2rem' }}>
+          <p className="landing-section-eyebrow">Got Questions?</p>
+          <h2 className="landing-section-title" style={{ marginBottom: '1.5rem' }}>Frequently Asked Questions</h2>
+
+          <div className="landing-faq-list" style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+            {FAQ_ITEMS.map((item, index) => {
+              const isOpen = openFaq === index
+              return (
+                <div
+                  key={index}
+                  style={{
+                    backgroundColor: '#ffffff',
+                    borderRadius: '16px',
+                    border: '1px solid #eaeaea',
+                    overflow: 'hidden',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleFaq(index)}
+                    style={{
+                      width: '100%',
+                      padding: '1.25rem 1.5rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      fontFamily: 'inherit',
+                      fontSize: '1.05rem',
+                      fontWeight: 600,
+                      color: '#1a1a1a',
+                      gap: '1rem'
+                    }}
+                  >
+                    <span>{item.q}</span>
+                    <ChevronIcon isOpen={isOpen} />
+                  </button>
+
+                  {isOpen && (
+                    <div
+                      style={{
+                        padding: '0 1.5rem 1.25rem 1.5rem',
+                        fontSize: '0.95rem',
+                        lineHeight: '1.6',
+                        color: '#4a4a4a',
+                        borderTop: '1px solid #f4f4f4',
+                        paddingTop: '1rem'
+                      }}
+                    >
+                      {item.a}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </section>
+
         {/* ─── Footer ─── */}
         <footer className="landing-footer">
           <p className="landing-footer-brand">
@@ -190,4 +289,4 @@ export default function LandingPage() {
       </div>
     </div>
   )
-} 
+}
