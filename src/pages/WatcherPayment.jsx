@@ -47,7 +47,7 @@ const SparklesOutlineIcon = () => (
 const INCLUDED = [
   { icon: <MicOutlineIcon />, title: 'Live Pitches', desc: 'Friends roast (and rave) about their single friends — live on stage.' },
   { icon: <CocktailOutlineIcon />, title: 'Drinks & Vibes', desc: 'A proper night out with great energy and even better people. Includes 1 complimentary drink voucher, redeemable on the night.' },
-  { icon: <ArmchairOutlineIcon />, title: 'Free Seating', desc: 'First come, first served. Grab any open spot you like.' },
+  { icon: <ArmchairOutlineIcon />, title: 'Free Seating', desc: 'Unreserved seating available throughout the venue.' },
   { icon: <HeartOutlineIcon />, title: 'Real Connections', desc: 'Meet people who were actually curated and vouched for.' },
   { icon: <SparklesOutlineIcon />, title: 'No Apps. No Swiping.', desc: 'Just real humans in a real room doing real romance.' },
 ]
