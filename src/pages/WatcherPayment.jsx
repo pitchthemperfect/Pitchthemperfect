@@ -23,6 +23,15 @@ const CocktailOutlineIcon = () => (
   </svg>
 )
 
+const ArmchairOutlineIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8386D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
+    <path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3" />
+    <path d="M3 11v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2Z" />
+    <path d="M5 18v2" />
+    <path d="M19 18v2" />
+  </svg>
+)
+
 const HeartOutlineIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8386D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
     <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
@@ -38,6 +47,7 @@ const SparklesOutlineIcon = () => (
 const INCLUDED = [
   { icon: <MicOutlineIcon />, title: 'Live Pitches', desc: 'Friends roast (and rave) about their single friends — live on stage.' },
   { icon: <CocktailOutlineIcon />, title: 'Drinks & Vibes', desc: 'A proper night out with great energy and even better people. Includes 1 complimentary drink voucher, redeemable on the night.' },
+  { icon: <ArmchairOutlineIcon />, title: 'Free Seating', desc: 'First come, first served. Grab any open spot you like.' },
   { icon: <HeartOutlineIcon />, title: 'Real Connections', desc: 'Meet people who were actually curated and vouched for.' },
   { icon: <SparklesOutlineIcon />, title: 'No Apps. No Swiping.', desc: 'Just real humans in a real room doing real romance.' },
 ]
