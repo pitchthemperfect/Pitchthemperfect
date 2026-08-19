@@ -20,6 +20,13 @@ const AGE_OPTIONS = [
   { value: '50+',   label: '50+' },
 ]
 
+const STATUS_OPTIONS = [
+  { value: 'Single', label: 'Single' },
+  { value: 'Married', label: 'Married' },
+  { value: 'Divorced', label: 'Divorced' },
+  { value: 'Its complicated', label: 'Its complicated' },
+]
+
 const NATIONALITIES = [
   "Emirati", "Afghan", "Albanian", "Algerian", "American", "Andorran", "Angolan", "Antiguan", 
   "Argentine", "Armenian", "Australian", "Austrian", "Azerbaijani", "Bahamian", "Bahraini", 
@@ -54,7 +61,7 @@ function getInitial() {
     const s = sessionStorage.getItem('ptp_watcher2')
     if (s) return JSON.parse(s) 
   } catch (_) {}
-  return { gender: '', age: '', nationality: '', consent: false }
+  return { gender: '', age: '', status: '', nationality: '', consent: false }
 }
 
 export default function WatcherStep2() {
@@ -82,6 +89,7 @@ export default function WatcherStep2() {
     const e = {}
     if (!form.gender)            e.gender      = 'Please select your gender'
     if (!form.age)               e.age         = 'Please select your age category'
+    if (!form.status)               e.status         = 'Please select your relationship status'
     if (!form.nationality.trim()) e.nationality = 'Please select your nationality'
     if (!form.consent)           e.consent     = 'Please accept to continue'
     return e
@@ -132,6 +140,15 @@ export default function WatcherStep2() {
             onChange={v => set('age', v)}
             required
             error={errors.age}
+          />
+
+          <ChipGroup
+            label="Status"
+            options={STATUS_OPTIONS}
+            value={form.status}
+            onChange={v => set('status', v)}
+            required
+            error={errors.status}
           />
 
           {/* Reduced margins for exact alignment */}
