@@ -414,12 +414,14 @@ export default function AdminPage() {
     }
   }
 
-  // Export to CSV helper
   const handleExport = () => {
-    const headers = 'ID,Name,Phone,Email,Role,Pitchee Gender,Their Name,Instagram,Relationship,Can Attend,Pitch,Links,Status,Attended,Date,Amount\n'
-    const csvContent = filteredData.map(r => 
-      `"${r.id}","${r.name}","${r.phone}","${r.email}","${r.role}","${r.pitchee_gender||''}","${r.their_name||''}","${r.instagram||''}","${r.relationship||''}","${r.can_attend||''}","${(r.pitch||'').replace(/"/g,'""')}","${r.links||''}","${r.status}","${r.attended?'Yes':'No'}","${r.date}","${r.amount}"`
-    ).join('\n')
+  // Added "Relationship Status" and "Nationality" to the header row
+  const headers = 'ID,Name,Phone,Email,Role,Pitchee Gender,Their Name,Instagram,Relationship,Relationship Status,Nationality,Can Attend,Pitch,Links,Status,Attended,Date,Amount\n'
+  
+  const csvContent = filteredData.map(r => 
+    // Added r.relationship_status and r.nationality to the mapping
+    `"${r.id}","${r.name}","${r.phone}","${r.email}","${r.role}","${r.pitchee_gender||''}","${r.their_name||''}","${r.instagram||''}","${r.relationship||''}","${r.relationship_status||''}","${r.nationality||''}","${r.can_attend||''}","${(r.pitch||'').replace(/"/g,'""')}","${r.links||''}","${r.status}","${r.attended?'Yes':'No'}","${r.date}","${r.amount}"`
+  ).join('\n')
     
     const blob = new Blob([headers + csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
