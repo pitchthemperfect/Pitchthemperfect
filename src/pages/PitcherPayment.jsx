@@ -32,6 +32,15 @@ const CocktailOutlineIcon = () => (
   </svg>
 )
 
+const ArmchairOutlineIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8386D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
+    <path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3" />
+    <path d="M3 11v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2Z" />
+    <path d="M5 18v2" />
+    <path d="M19 18v2" />
+  </svg>
+)
+
 const SparklesOutlineIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8386D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
     <path d="M12 3c0 4.5-4.5 9-9 9 4.5 0 9 4.5 9 9 0-4.5 4.5-9 9-9-4.5 0-9-4.5-9-9z" />
@@ -42,6 +51,7 @@ const INCLUDED = [
   { icon: <MicOutlineIcon />, title: 'Nominate & Pitch Live', desc: 'Present your single friend live on stage to a curated room of potential matches.' },
   { icon: <PeopleOutlineIcon />, title: 'Full Entry for Both', desc: 'Your ticket covers entry for both you (the Pitcher) and your single friend (the Pitchee).' },
   { icon: <CocktailOutlineIcon />, title: 'Drinks Included', desc: 'Includes 2 complimentary drink vouchers (one for each of you), redeemable on the night.' },
+  { icon: <ArmchairOutlineIcon />, title: 'Free Seating', desc: 'Unreserved seating available throughout the venue.' },
   { icon: <SparklesOutlineIcon />, title: 'Matchmaking Support', desc: 'Dedicated support during the social hour to help your friend connect with interested matches.' },
 ]
 
