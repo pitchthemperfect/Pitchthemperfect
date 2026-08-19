@@ -134,11 +134,11 @@ export default function WatcherStep2() {
             error={errors.age}
           />
 
-          {/* Nationality Dropdown with aligned spacing and height */}
-          <div className="form-group" style={{ marginTop: '1rem' }}>
-            <label htmlFor="nationality" className="chip-group-label">
+          {/* Nationality Dropdown matching section spacing and proportions */}
+          <div className="form-group" style={{ marginTop: '1.25rem' }}>
+            <div className="chip-group-label" style={{ marginBottom: '0.5rem' }}>
               Nationality <span className="req">*</span>
-            </label>
+            </div>
 
             <select
               id="nationality"
@@ -147,12 +147,11 @@ export default function WatcherStep2() {
               className={`form-input ${errors.nationality ? 'is-invalid' : ''}`}
               style={{
                 width: '100%',
-                height: '46px',
-                padding: '0 1.25rem',
+                padding: '0.75rem 1.25rem',
                 fontSize: '0.95rem',
                 color: form.nationality ? '#1a1a1a' : '#9ca3af',
-                backgroundColor: '#fbfbfb',
-                border: errors.nationality ? '1px solid #dc2626' : '1px solid #e0e0e0',
+                backgroundColor: '#f7f7f8',
+                border: errors.nationality ? '1px solid #dc2626' : '1px solid #e2e8f0',
                 borderRadius: '16px',
                 outline: 'none',
                 boxSizing: 'border-box',
@@ -163,7 +162,7 @@ export default function WatcherStep2() {
                 backgroundPosition: 'right 1.25rem center',
                 backgroundSize: '0.9em',
                 cursor: 'pointer',
-                transition: 'border-color 0.2s ease'
+                transition: 'all 0.2s ease'
               }}
             >
               <option value="" disabled hidden>
