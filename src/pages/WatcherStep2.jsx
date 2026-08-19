@@ -105,27 +105,27 @@ export default function WatcherStep2() {
             error={errors.age}
           />
 
-          {/* Nationality Field Styled like Reference Image */}
+          {/* Nationality Field - Matched Font & Spacing */}
           <div 
             className="form-group" 
             style={{ 
-              marginTop: '1.5rem', 
-              marginBottom: '1rem',
+              marginTop: '1.25rem', 
               display: 'flex', 
               flexDirection: 'column' 
             }}
           >
             <label 
               htmlFor="nationality" 
+              className="form-label"
               style={{
-                fontSize: '1rem',
+                fontSize: '0.9375rem',
                 fontWeight: '600',
                 color: '#1a1a1a',
                 marginBottom: '0.5rem',
                 fontFamily: 'inherit'
               }}
             >
-              Nationality <span style={{ color: '#1a1a1a', marginLeft: '0.2rem' }}>*</span>
+              Nationality <span className="req">*</span>
             </label>
 
             <input
@@ -136,14 +136,13 @@ export default function WatcherStep2() {
               onChange={e => set('nationality', e.target.value)}
               style={{
                 width: '100%',
-                padding: '1rem 1.25rem',
-                fontSize: '1rem',
+                padding: '0.875rem 1.25rem',
+                fontSize: '0.9375rem',
                 color: '#1a1a1a',
-                backgroundColor: '#fafafa',
-                border: errors.nationality ? '1px solid #dc2626' : '1px solid #e5e7eb',
-                borderRadius: '12px',
+                backgroundColor: '#f8f9fa',
+                border: errors.nationality ? '1px solid #dc2626' : '1px solid #e2e8f0',
+                borderRadius: '16px',
                 outline: 'none',
-                boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.02)',
                 boxSizing: 'border-box',
                 fontFamily: 'inherit',
                 transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
@@ -156,7 +155,7 @@ export default function WatcherStep2() {
                 style={{ 
                   color: '#dc2626', 
                   fontSize: '0.85rem', 
-                  marginTop: '0.4rem',
+                  marginTop: '0.35rem',
                   fontWeight: '500' 
                 }}
               >
