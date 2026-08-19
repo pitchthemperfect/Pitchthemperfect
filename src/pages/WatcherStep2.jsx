@@ -115,7 +115,7 @@ export default function WatcherStep2() {
               id="nationality"
               type="text"
               className={`form-input ${errors.nationality ? 'is-invalid' : ''}`}
-              placeholder="e.g. Italian, Japanese, Canadian"
+              placeholder="e.g. Emiratis"
               value={form.nationality}
               onChange={e => set('nationality', e.target.value)}
             />
