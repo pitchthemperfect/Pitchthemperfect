@@ -203,11 +203,11 @@ export default function AdminPage() {
           r.links && `Links: ${r.links}`,
         ].filter(Boolean).join(' · ')
       : [
-          `Gender: ${r.gender || '—'}`,
-          `Age: ${r.age_group || '—'}`,
-          relStatus && `Status: ${relStatus}`,
-          nat && `Nat: ${nat}`,
-        ].filter(Boolean).join(', '),
+    `Gender: ${r.gender || '—'}`,
+    `Age: ${r.age_group || '—'}`,
+    relStatus && `Status: ${relStatus}`,
+    nat && `Nationality: ${nat}`,
+  ].filter(Boolean).join(' · '),
     pitch: r.pitch || '',
     status: r.status,
     attended: r.attended || false,
