@@ -87,11 +87,21 @@ export default function PitcherPayment() {
       if (step1.name) {
         const eventId = await getActiveEventId()
         const { error, data: inserted } = await supabase.from('registrations').insert({
-          name: step1.name, whatsapp: step1.phone || '', email: step1.email,
-          role: 'pitcher', relationship: step2.relationship || '', pitchee_gender: step2.pitcheeGender || '',
-          instagram: step2.instagram || '', their_name: step2.theirName || '', can_attend: step2.canAttend || '',
-          pitch: step2.pitch || '', status: 'pending', amount: `AED ${ticketPrice}`,
-          links: step2.links || '', event_id: eventId,
+          name: step1.name, 
+          whatsapp: step1.phone || '', 
+          email: step1.email,
+          role: 'pitcher', 
+          relationship: step2.relationship || '', 
+          pitchee_gender: step2.pitcheeGender || '',
+          instagram: step2.instagram || '', 
+          their_name: step2.theirName || '', 
+          nationality: step2.nationality || '', // <--- ADDED: Saves Pitchee Nationality
+          can_attend: step2.canAttend || '',
+          pitch: step2.pitch || '', 
+          status: 'pending', 
+          amount: `AED ${ticketPrice}`,
+          links: step2.links || '', 
+          event_id: eventId,
         }).select('id').single()
 
         if (error) throw error
