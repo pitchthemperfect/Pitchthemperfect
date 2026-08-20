@@ -438,12 +438,11 @@ export default function AdminPage() {
 
   const handleExport = () => {
   // Added "Relationship Status" and "Nationality" to the header row
-  const headers = 'ID,Name,Phone,Email,Role,Pitchee Gender,Their Name,Instagram,Relationship,Relationship Status,Nationality,Can Attend,Pitch,Links,Status,Attended,Date,Amount\n'
+  const headers = 'ID,Name,Phone,Email,Role,Gender,Age Group,Relationship Status,Nationality,Their Name,Instagram,Can Attend,Pitch,Links,Status,Attended,Date,Amount\n'
   
-  const csvContent = filteredData.map(r => 
-    // Added r.relationship_status and r.nationality to the mapping
-    `"${r.id}","${r.name}","${r.phone}","${r.email}","${r.role}","${r.pitchee_gender||''}","${r.their_name||''}","${r.instagram||''}","${r.relationship||''}","${r.relationship_status||''}","${r.nationality||''}","${r.can_attend||''}","${(r.pitch||'').replace(/"/g,'""')}","${r.links||''}","${r.status}","${r.attended?'Yes':'No'}","${r.date}","${r.amount}"`
-  ).join('\n')
+const csvContent = filteredData.map(r => 
+  `"${r.id}","${r.name}","${r.phone}","${r.email}","${r.role}","${r.gender||''}","${r.age_group||''}","${r.relationship_status||''}","${r.nationality||''}","${r.their_name||''}","${r.instagram||''}","${r.can_attend||''}","${(r.pitch||'').replace(/"/g,'""')}","${r.links||''}","${r.status}","${r.attended?'Yes':'No'}","${r.date}","${r.amount}"`
+).join('\n')
     
     const blob = new Blob([headers + csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
