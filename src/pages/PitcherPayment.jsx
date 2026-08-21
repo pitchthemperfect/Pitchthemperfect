@@ -60,8 +60,7 @@ const SUPABASE_URL = 'https://tnohztvpuflwkltkbphg.supabase.co'
 export default function PitcherPayment() {
   const navigate = useNavigate()
   const [ticketPrice, setTicketPrice] = useState('310.00')
-  const [embeddedUrl, setEmbeddedUrl] = useState('')
-  const [paymentId, setPaymentId] = useState('')
+  const [paymentUrl, setPaymentUrl] = useState('')
   const [paying, setPaying] = useState(false)
   const [registered, setRegistered] = useState(false)
 
@@ -77,7 +76,7 @@ export default function PitcherPayment() {
   }, [])
 
   const handlePayClick = async () => {
-    if (registered) return // Already registered
+    if (registered || paying) return
     setPaying(true)
 
     try {
@@ -95,7 +94,7 @@ export default function PitcherPayment() {
           pitchee_gender: step2.pitcheeGender || '',
           instagram: step2.instagram || '', 
           their_name: step2.theirName || '', 
-          nationality: step2.nationality || '', // <--- ADDED: Saves Pitchee Nationality
+          nationality: step2.nationality || '',
           can_attend: step2.canAttend || '',
           pitch: step2.pitch || '', 
           status: 'pending', 
@@ -108,27 +107,36 @@ export default function PitcherPayment() {
         setRegistered(true)
         trackCompleteRegistration({ role: 'pitcher' })
 
-        // Create Ziina payment via Edge Function
+        // Create Dynamic Ziina Payment via Supabase Edge Function
         if (SUPABASE_URL) {
           const res = await fetch(`${SUPABASE_URL}/functions/v1/create-payment`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount: ticketPrice, role: 'pitcher', registration_id: inserted?.id }),
+            body: JSON.stringify({ 
+              amount: ticketPrice, 
+              role: 'pitcher', 
+              registration_id: inserted?.id 
+            }),
           })
+          
           const ziina = await res.json()
-          if (ziina.embedded_url) {
-            setEmbeddedUrl(ziina.embedded_url)
-            setPaymentId(ziina.id)
-            // Link payment to registration
+          
+          // Use zipper redirect_url or embedded_url returned dynamically by Edge Function
+          const checkoutUrl = ziina.redirect_url || ziina.embeddedUrl || ziina.embedded_url
+
+          if (checkoutUrl) {
+            setPaymentUrl(checkoutUrl)
+            
+            // Link Ziina Payment Intent ID to DB record
             if (inserted?.id && ziina.id) {
-              supabase.from('registrations').update({ ziina_payment_id: ziina.id }).eq('id', inserted.id).then(() => {})
+              await supabase.from('registrations').update({ ziina_payment_id: ziina.id }).eq('id', inserted.id)
             }
             setPaying(false)
             return
           }
         }
 
-        // Fallback: no Edge Function available
+        // Fallback if no Edge Function response
         navigate('/register/pitcher/success')
       }
     } catch (err) {
@@ -137,29 +145,36 @@ export default function PitcherPayment() {
     }
   }
 
-  // After iframe closes / payment done, navigate to success
+  // Opens payment URL in a new tab cleanly without early redirecting
   useEffect(() => {
-    if (!embeddedUrl) return
-    // Ziina doesn't support iframe embedding — open in new tab
-    const w = window.open(embeddedUrl.replace('/embedded', ''), '_blank')
-    if (!w) {
-      // Popup blocked, fallback to redirect
-      window.location.href = embeddedUrl.replace('/embedded', '')
-    } else {
-      navigate('/register/pitcher/success')
-    }
-  }, [embeddedUrl, navigate])
+    if (!paymentUrl) return
 
-  if (embeddedUrl) {
-    // Payment opened in new tab — shown fallback message
+    const paymentWindow = window.open(paymentUrl, '_blank')
+    
+    if (!paymentWindow) {
+      // Fallback if browser blocks popups
+      window.location.href = paymentUrl
+    }
+  }, [paymentUrl])
+
+  if (paymentUrl) {
     return (
-      <PageShell badge="Payment Opened" title="Complete Your Payment" titleNormal tagline="A payment window has been opened. Complete your payment there, then close this page.">
+      <PageShell 
+        badge="Payment Opened" 
+        title="Complete Your Payment" 
+        titleNormal 
+        tagline="A payment window has been opened. Complete your verification there."
+      >
         <div className="price-card">
           <p className="price-amount" style={{ fontSize: 48 }}>💳</p>
           <p style={{ fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 20 }}>
-            Payment opened in a new tab. Once complete, you can close this window.
+            Payment opened in a new tab. Once you approve the payment (3DS OTP), you can return or close this window.
           </p>
-          <button className="btn-primary" onClick={() => navigate('/')} style={{ background: '#FFF', color: '#E8386D', border: '2px solid #E8386D' }}>
+          <button 
+            className="btn-primary" 
+            onClick={() => navigate('/')} 
+            style={{ background: '#FFF', color: '#E8386D', border: '2px solid #E8386D' }}
+          >
             Back to Home
           </button>
         </div>
