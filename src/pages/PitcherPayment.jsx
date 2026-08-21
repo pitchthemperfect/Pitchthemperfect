@@ -53,27 +53,31 @@ const INCLUDED = [
   { icon: <SparklesOutlineIcon />, title: 'Matchmaking Support', desc: 'Dedicated support during the social hour to help your friend connect with interested matches.' },
 ]
 
-const SUPABASE_URL = 'https://tnohztvpuflwkltkbphg.supabase.co'
+// Direct fallback static link
+const PITCHER_PAYMENT_URL = 'https://pay.ziina.com/dvlp/iF8q5t_wl?source=app'
 
 export default function PitcherPayment() {
   const [ticketPrice, setTicketPrice] = useState('310.00')
-  const [paymentUrl, setPaymentUrl] = useState('')
+  const [directUrl, setDirectUrl] = useState(PITCHER_PAYMENT_URL)
   const [paying, setPaying] = useState(false)
-  const [registered, setRegistered] = useState(false)
 
   useEffect(() => {
     trackBeginCheckout({ role: 'pitcher' })
     const fetchSettings = async () => {
       try {
+        // Fetch custom price & direct URL if configured in DB
         const { data: priceData } = await supabase.from('settings').select('value').eq('key', 'pitcher_price').single()
         if (priceData?.value) setTicketPrice(priceData.value)
+
+        const { data: urlData } = await supabase.from('settings').select('value').eq('key', 'pitcher_payment_url').single()
+        if (urlData?.value) setDirectUrl(urlData.value)
       } catch (_) {}
     }
     fetchSettings()
   }, [])
 
   const handlePayClick = async () => {
-    if (registered || paying) return
+    if (paying) return
     setPaying(true)
 
     try {
@@ -82,7 +86,9 @@ export default function PitcherPayment() {
 
       if (step1.name) {
         const eventId = await getActiveEventId()
-        const { error, data: inserted } = await supabase.from('registrations').insert({
+        
+        // Simpan data pendaftaran ke Supabase DB dulu
+        await supabase.from('registrations').insert({
           name: step1.name, 
           whatsapp: step1.phone || '', 
           email: step1.email,
@@ -98,46 +104,17 @@ export default function PitcherPayment() {
           amount: `AED ${ticketPrice}`,
           links: step2.links || '', 
           event_id: eventId,
-        }).select('id').single()
+        })
 
-        if (error) throw error
-        setRegistered(true)
         trackCompleteRegistration({ role: 'pitcher' })
-
-        if (SUPABASE_URL) {
-          const res = await fetch(`${SUPABASE_URL}/functions/v1/create-payment`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              amount: ticketPrice, 
-              role: 'pitcher', 
-              registration_id: inserted?.id 
-            }),
-          })
-          
-          const ziina = await res.json()
-          const checkoutUrl = ziina.redirect_url || ziina.embedded_url
-
-          if (checkoutUrl) {
-            setPaymentUrl(checkoutUrl)
-            if (inserted?.id && ziina.id) {
-              await supabase.from('registrations').update({ ziina_payment_id: ziina.id }).eq('id', inserted.id)
-            }
-            return
-          }
-        }
       }
     } catch (err) {
-      console.error('Payment error:', err)
-      setPaying(false)
+      console.error('Registration save error:', err)
+    } finally {
+      // Langsung berpindah halaman ke Ziina secepat dan sesmooth mungkin
+      window.location.href = directUrl
     }
   }
-
-  // Redirect current tab directly to Ziina payment link
-  useEffect(() => {
-    if (!paymentUrl) return
-    window.location.href = paymentUrl
-  }, [paymentUrl])
 
   return (
     <PageShell
@@ -167,7 +144,7 @@ export default function PitcherPayment() {
         <p className="price-eyebrow">Ticket Price</p>
         <p className="price-amount"><span>AED</span>{ticketPrice}</p>
         <button id="btn-pay-now" className="btn-primary" onClick={handlePayClick} disabled={paying}>
-          {paying ? 'Redirecting to Ziina...' : 'Pay Now \u00A0→'}
+          {paying ? 'Opening Payment...' : 'Pay Now \u00A0→'}
         </button>
         <p className="price-secure">🔒 Secure payment via Ziina</p>
       </div>
