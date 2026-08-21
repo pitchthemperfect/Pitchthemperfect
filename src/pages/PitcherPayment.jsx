@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import PageShell from '../components/PageShell'
 import FormCard from '../components/FormCard'
 import BackButton from '../components/BackButton'
@@ -19,8 +18,7 @@ const PeopleOutlineIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8386D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
     <circle cx="9" cy="7" r="4" />
-    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    <path d="M22 21v-2a4 4 0 0 1 0 7.75" />
   </svg>
 )
 
@@ -58,7 +56,6 @@ const INCLUDED = [
 const SUPABASE_URL = 'https://tnohztvpuflwkltkbphg.supabase.co'
 
 export default function PitcherPayment() {
-  const navigate = useNavigate()
   const [ticketPrice, setTicketPrice] = useState('310.00')
   const [paymentUrl, setPaymentUrl] = useState('')
   const [paying, setPaying] = useState(false)
@@ -107,7 +104,6 @@ export default function PitcherPayment() {
         setRegistered(true)
         trackCompleteRegistration({ role: 'pitcher' })
 
-        // Create Dynamic Ziina Payment via Edge Function
         if (SUPABASE_URL) {
           const res = await fetch(`${SUPABASE_URL}/functions/v1/create-payment`, {
             method: 'POST',
@@ -120,24 +116,16 @@ export default function PitcherPayment() {
           })
           
           const ziina = await res.json()
-          
-          // Get checkout URL from Edge Function response
-          const checkoutUrl = ziina.redirect_url || ziina.embeddedUrl || ziina.embedded_url || ziina.url
+          const checkoutUrl = ziina.redirect_url || ziina.embedded_url
 
           if (checkoutUrl) {
-            // Store Ziina payment ID in Supabase
+            setPaymentUrl(checkoutUrl)
             if (inserted?.id && ziina.id) {
               await supabase.from('registrations').update({ ziina_payment_id: ziina.id }).eq('id', inserted.id)
             }
-            
-            // Set payment URL to trigger full-page redirect
-            setPaymentUrl(checkoutUrl)
             return
           }
         }
-
-        // Fallback if no Edge Function response
-        navigate('/register/pitcher/success')
       }
     } catch (err) {
       console.error('Payment error:', err)
@@ -145,11 +133,10 @@ export default function PitcherPayment() {
     }
   }
 
-  // Perform full-page navigation to Ziina to preserve 3DS session state
+  // Redirect current tab directly to Ziina payment link
   useEffect(() => {
-    if (paymentUrl) {
-      window.location.href = paymentUrl
-    }
+    if (!paymentUrl) return
+    window.location.href = paymentUrl
   }, [paymentUrl])
 
   return (
@@ -180,7 +167,7 @@ export default function PitcherPayment() {
         <p className="price-eyebrow">Ticket Price</p>
         <p className="price-amount"><span>AED</span>{ticketPrice}</p>
         <button id="btn-pay-now" className="btn-primary" onClick={handlePayClick} disabled={paying}>
-          {paying ? 'Redirecting to Payment...' : 'Pay Now \u00A0→'}
+          {paying ? 'Redirecting to Ziina...' : 'Pay Now \u00A0→'}
         </button>
         <p className="price-secure">🔒 Secure payment via Ziina</p>
       </div>
