@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import PageShell from '../components/PageShell'
 import FormCard from '../components/FormCard'
 import BackButton from '../components/BackButton'
@@ -52,15 +51,13 @@ const INCLUDED = [
   { icon: <SparklesOutlineIcon />, title: 'No Apps. No Swiping.', desc: 'Just real humans in a real room doing real romance.' },
 ]
 
-const SUPABASE_URL = 'https://tnohztvpuflwkltkbphg.supabase.co'
+// Direct fallback static link for Watcher
+const WATCHER_PAYMENT_URL = 'https://pay.ziina.com/dvlp/h8JnaEPat?source=app'
 
 export default function WatcherPayment() {
-  const navigate = useNavigate()
-  const [ticketPrice, setTicketPrice] = useState('181.00')
-  const [embeddedUrl, setEmbeddedUrl] = useState('')
-  const [paymentId, setPaymentId] = useState('')
+  const [ticketPrice, setTicketPrice] = useState('185.00')
+  const [directUrl, setDirectUrl] = useState(WATCHER_PAYMENT_URL)
   const [paying, setPaying] = useState(false)
-  const [registered, setRegistered] = useState(false)
 
   useEffect(() => {
     trackBeginCheckout({ role: 'watcher' })
@@ -68,13 +65,16 @@ export default function WatcherPayment() {
       try {
         const { data: priceData } = await supabase.from('settings').select('value').eq('key', 'watcher_price').single()
         if (priceData?.value) setTicketPrice(priceData.value)
+
+        const { data: urlData } = await supabase.from('settings').select('value').eq('key', 'watcher_payment_url').single()
+        if (urlData?.value) setDirectUrl(urlData.value)
       } catch (_) {}
     }
     fetchSettings()
   }, [])
 
   const handlePayClick = async () => {
-    if (registered) return
+    if (paying) return
     setPaying(true)
 
     try {
@@ -83,7 +83,9 @@ export default function WatcherPayment() {
 
       if (step1.name) {
         const eventId = await getActiveEventId()
-        const { error, data: inserted } = await supabase.from('registrations').insert({
+        
+        // Save registration data to Supabase DB first
+        await supabase.from('registrations').insert({
           name: step1.name, 
           whatsapp: step1.phone || '', 
           email: step1.email,
@@ -95,63 +97,16 @@ export default function WatcherPayment() {
           status: 'pending', 
           amount: `AED ${ticketPrice}`, 
           event_id: eventId,
-        }).select('id').single()
+        })
 
-        if (error) throw error
-        setRegistered(true)
         trackCompleteRegistration({ role: 'watcher' })
-
-        if (SUPABASE_URL) {
-          const res = await fetch(`${SUPABASE_URL}/functions/v1/create-payment`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount: ticketPrice, role: 'watcher', registration_id: inserted?.id }),
-          })
-          const ziina = await res.json()
-          if (ziina.embedded_url) {
-            setEmbeddedUrl(ziina.embedded_url)
-            setPaymentId(ziina.id)
-            if (inserted?.id && ziina.id) {
-              supabase.from('registrations').update({ ziina_payment_id: ziina.id }).eq('id', inserted.id).then(() => {})
-            }
-            setPaying(false)
-            return
-          }
-        }
-
-        navigate('/success/watcher')
       }
     } catch (err) {
-      console.error('Payment error:', err)
-      setPaying(false)
+      console.error('Registration save error:', err)
+    } finally {
+      // Direct smooth redirect to Ziina
+      window.location.href = directUrl
     }
-  }
-
-  useEffect(() => {
-    if (!embeddedUrl) return
-    // Ziina doesn't support iframe embedding — open in new tab
-    const w = window.open(embeddedUrl.replace('/embedded', ''), '_blank')
-    if (!w) {
-      window.location.href = embeddedUrl.replace('/embedded', '')
-    } else {
-      navigate('/success/watcher')
-    }
-  }, [embeddedUrl, navigate])
-
-  if (embeddedUrl) {
-    return (
-      <PageShell badge="Payment Opened" title="Complete Your Payment" titleNormal tagline="A payment window has been opened. Complete your payment there, then close this page.">
-        <div className="price-card">
-          <p className="price-amount" style={{ fontSize: 48 }}>💳</p>
-          <p style={{ fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 20 }}>
-            Payment opened in a new tab. Once complete, you can close this window.
-          </p>
-          <button className="btn-primary" onClick={() => navigate('/')} style={{ background: '#FFF', color: '#E8386D', border: '2px solid #E8386D' }}>
-            Back to Home
-          </button>
-        </div>
-      </PageShell>
-    )
   }
 
   return (
@@ -182,7 +137,7 @@ export default function WatcherPayment() {
         <p className="price-eyebrow">Ticket Price</p>
         <p className="price-amount"><span>AED</span>{ticketPrice}</p>
         <button id="btn-pay-now" className="btn-primary" onClick={handlePayClick} disabled={paying}>
-          {paying ? 'Creating payment...' : 'Pay Now \u00A0→'}
+          {paying ? 'Opening Payment...' : 'Pay Now \u00A0→'}
         </button>
         <p className="price-secure">🔒 Secure payment via Ziina</p>
       </div>
