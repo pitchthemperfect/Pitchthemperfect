@@ -107,7 +107,7 @@ export default function PitcherPayment() {
         setRegistered(true)
         trackCompleteRegistration({ role: 'pitcher' })
 
-        // Create Dynamic Ziina Payment via Supabase Edge Function
+        // Create Dynamic Ziina Payment via Edge Function
         if (SUPABASE_URL) {
           const res = await fetch(`${SUPABASE_URL}/functions/v1/create-payment`, {
             method: 'POST',
@@ -121,17 +121,17 @@ export default function PitcherPayment() {
           
           const ziina = await res.json()
           
-          // Use zipper redirect_url or embedded_url returned dynamically by Edge Function
-          const checkoutUrl = ziina.redirect_url || ziina.embeddedUrl || ziina.embedded_url
+          // Get checkout URL from Edge Function response
+          const checkoutUrl = ziina.redirect_url || ziina.embeddedUrl || ziina.embedded_url || ziina.url
 
           if (checkoutUrl) {
-            setPaymentUrl(checkoutUrl)
-            
-            // Link Ziina Payment Intent ID to DB record
+            // Store Ziina payment ID in Supabase
             if (inserted?.id && ziina.id) {
               await supabase.from('registrations').update({ ziina_payment_id: ziina.id }).eq('id', inserted.id)
             }
-            setPaying(false)
+            
+            // Set payment URL to trigger full-page redirect
+            setPaymentUrl(checkoutUrl)
             return
           }
         }
@@ -145,42 +145,12 @@ export default function PitcherPayment() {
     }
   }
 
-  // Opens payment URL in a new tab cleanly without early redirecting
+  // Perform full-page navigation to Ziina to preserve 3DS session state
   useEffect(() => {
-    if (!paymentUrl) return
-
-    const paymentWindow = window.open(paymentUrl, '_blank')
-    
-    if (!paymentWindow) {
-      // Fallback if browser blocks popups
+    if (paymentUrl) {
       window.location.href = paymentUrl
     }
   }, [paymentUrl])
-
-  if (paymentUrl) {
-    return (
-      <PageShell 
-        badge="Payment Opened" 
-        title="Complete Your Payment" 
-        titleNormal 
-        tagline="A payment window has been opened. Complete your verification there."
-      >
-        <div className="price-card">
-          <p className="price-amount" style={{ fontSize: 48 }}>💳</p>
-          <p style={{ fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 20 }}>
-            Payment opened in a new tab. Once you approve the payment (3DS OTP), you can return or close this window.
-          </p>
-          <button 
-            className="btn-primary" 
-            onClick={() => navigate('/')} 
-            style={{ background: '#FFF', color: '#E8386D', border: '2px solid #E8386D' }}
-          >
-            Back to Home
-          </button>
-        </div>
-      </PageShell>
-    )
-  }
 
   return (
     <PageShell
@@ -210,7 +180,7 @@ export default function PitcherPayment() {
         <p className="price-eyebrow">Ticket Price</p>
         <p className="price-amount"><span>AED</span>{ticketPrice}</p>
         <button id="btn-pay-now" className="btn-primary" onClick={handlePayClick} disabled={paying}>
-          {paying ? 'Creating payment...' : 'Pay Now \u00A0→'}
+          {paying ? 'Redirecting to Payment...' : 'Pay Now \u00A0→'}
         </button>
         <p className="price-secure">🔒 Secure payment via Ziina</p>
       </div>
